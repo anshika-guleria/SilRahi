@@ -1,0 +1,37 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  background: #fff7fb;
+  color: #171717;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(18px);
+}
+
+.map-panel {
+  min-height: 440px;
+}
+
+.leaflet-container {
+  width: 100%;
+  min-height: 440px;
+  border-radius: 8px;
+}
+
+.location-picker-map .leaflet-container {
+  min-height: 280px;
+  border-radius: 0;
+}
+
+input,
+select,
+textarea {
+  outline: none;
+}
