@@ -53,7 +53,7 @@ router.get(
       lat,
       lng,
       radiusKm = 20,
-      verified = "true",
+      verified = "all",
       sort = "distance"
     } = req.query;
     let snapshot = await db.collection("tailors").get();
@@ -85,6 +85,8 @@ router.get(
       );
     }
 
+    tailors = tailors.filter((tailor) => isValidCoordinate(tailor.location));
+
     if (lat && lng) {
       const origin = toCoordinate(lat, lng);
       if (!origin) {
@@ -92,7 +94,6 @@ router.get(
       }
       const safeRadius = Math.min(Math.max(Number(radiusKm) || 20, 1), 100);
       tailors = tailors
-        .filter((tailor) => isValidCoordinate(tailor.location))
         .map((tailor) => ({
           ...tailor,
           distanceKm: Number(distanceKm(origin, tailor.location).toFixed(2))

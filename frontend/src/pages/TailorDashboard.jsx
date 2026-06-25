@@ -44,6 +44,50 @@ function emptyProfile(user) {
   };
 }
 
+function cleanOptionalString(value, minLength = 1) {
+  const text = String(value || "").trim();
+  return text.length >= minLength ? text : undefined;
+}
+
+function validUrl(value) {
+  try {
+    return Boolean(new URL(value));
+  } catch {
+    return false;
+  }
+}
+
+function buildTailorPayload(profile) {
+  const payload = {
+    name: cleanOptionalString(profile.name, 2),
+    shopName: cleanOptionalString(profile.shopName, 2),
+    shopType: profile.shopType || "Home-based",
+    phone: cleanOptionalString(profile.phone, 10),
+    address: cleanOptionalString(profile.address, 3),
+    skills: Array.isArray(profile.skills) ? profile.skills.filter(Boolean) : [],
+    serviceFees: (profile.serviceFees || [])
+      .map((fee) => ({
+        service: cleanOptionalString(fee.service, 2),
+        fee: cleanOptionalString(fee.fee, 1)
+      }))
+      .filter((fee) => fee.service && fee.fee),
+    experienceYears: Number(profile.experienceYears || 0),
+    priceRange: String(profile.priceRange || "").trim(),
+    availability: profile.availability || "available",
+    about: String(profile.about || "").trim(),
+    workSamples: (profile.workSamples || []).filter(validUrl)
+  };
+
+  if (profile.location?.lat && profile.location?.lng) {
+    payload.location = {
+      lat: Number(profile.location.lat),
+      lng: Number(profile.location.lng)
+    };
+  }
+
+  return Object.fromEntries(Object.entries(payload).filter(([, value]) => value !== undefined));
+}
+
 /* ── Stat Card ── */
 function StatCard({ label, value, icon: Icon, color, loading }) {
   return (
@@ -189,11 +233,7 @@ export function TailorDashboard() {
   async function saveProfile(e) {
     e.preventDefault(); setSaving(true);
     try {
-      await api.updateTailor({ ...profile,
-        experienceYears: Number(profile.experienceYears||0),
-        location: { lat: Number(profile.location?.lat||28.6139), lng: Number(profile.location?.lng||77.209) },
-        serviceFees: (profile.serviceFees||[]).filter(f=>f.service&&f.fee)
-      });
+      await api.updateTailor(buildTailorPayload(profile));
       notify("Profile saved successfully!");
       await load();
     } catch(e) { notify(e.message,"error"); }

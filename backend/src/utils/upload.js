@@ -1,4 +1,5 @@
 import multer from "multer";
+import { randomUUID } from "node:crypto";
 import { bucket } from "../config/firebase.js";
 
 export const upload = multer({
@@ -32,12 +33,17 @@ export async function uploadBookingReference(uid, file) {
 
 async function uploadImage(path, file) {
   const firebaseFile = bucket.file(path);
+  const downloadToken = randomUUID();
 
   await firebaseFile.save(file.buffer, {
-    metadata: { contentType: file.mimetype },
+    metadata: {
+      contentType: file.mimetype,
+      metadata: {
+        firebaseStorageDownloadTokens: downloadToken
+      }
+    },
     resumable: false
   });
 
-  await firebaseFile.makePublic();
-  return `https://storage.googleapis.com/${bucket.name}/${path}`;
+  return `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(path)}?alt=media&token=${downloadToken}`;
 }

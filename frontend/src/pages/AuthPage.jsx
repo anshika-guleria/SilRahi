@@ -11,8 +11,12 @@ function dashboardPageForRole(role) {
   return "customer";
 }
 
+function roleMismatchMessage(selectedRole, actualRole) {
+  return `This account is registered as ${actualRole}. Please login from the ${actualRole} option or create a separate ${selectedRole} account.`;
+}
+
 export function AuthPage({ setPage, initialRole = "customer" }) {
-  const { user, login, register, loginWithGoogle, loading } = useAuth();
+  const { user, login, register, loginWithGoogle, logout, loading } = useAuth();
   const { t } = useLang();
 
   const [mode, setMode] = useState("login");
@@ -45,8 +49,13 @@ export function AuthPage({ setPage, initialRole = "customer" }) {
     try {
       const user =
         mode === "login"
-          ? await login(form.email, form.password)
+          ? await login(form.email, form.password, form.role)
           : await register(form);
+      if (user.role !== form.role && user.role !== "admin") {
+        logout();
+        setError(roleMismatchMessage(form.role, user.role));
+        return;
+      }
       setPage(dashboardPageForRole(user.role));
     } catch (err) {
       setError(err.message);
@@ -57,6 +66,11 @@ export function AuthPage({ setPage, initialRole = "customer" }) {
     setError("");
     try {
       const user = await loginWithGoogle(form.role);
+      if (user.role !== form.role && user.role !== "admin") {
+        logout();
+        setError(roleMismatchMessage(form.role, user.role));
+        return;
+      }
       setPage(dashboardPageForRole(user.role));
     } catch (err) {
       setError(err.message);

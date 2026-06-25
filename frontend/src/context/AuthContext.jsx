@@ -44,10 +44,10 @@ export function AuthProvider({ children }) {
     }
   }, [user]);
 
-  async function login(email, password) {
+  async function login(email, password, role) {
     setLoading(true);
     try {
-      const data = await api.login({ email, password });
+      const data = await api.login({ email, password, role });
       localStorage.setItem("silrahi_token", data.token);
       setUser(data.user);
       return data.user;

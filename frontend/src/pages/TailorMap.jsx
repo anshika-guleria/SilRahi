@@ -197,6 +197,7 @@ export function TailorMap({ setPage, setSelectedTailor }) {
                 <Popup>
                   <strong>{tailor.name}</strong>
                   <p>{tailor.shopName || "Home tailor"} - {(tailor.skills || []).slice(0, 2).join(", ") || "Stitching"}</p>
+                  <p>{tailor.verified ? "Verified tailor" : "Verification pending"}</p>
                   <p>Rating: {tailor.rating || 0} - {tailor.priceRange || "Price on request"}</p>
                   <button type="button" onClick={() => view(tailor)}>View Profile</button>
                 </Popup>
@@ -218,6 +219,11 @@ export function TailorMap({ setPage, setSelectedTailor }) {
                 <div>
                   <h3 className="font-bold">{tailor.name}</h3>
                   <p className="text-sm font-semibold text-neutral-700">{tailor.shopName || "Home tailor"} - {tailor.shopType || "Home-based"}</p>
+                  <span className={`mt-1 inline-flex rounded-full px-2 py-0.5 text-xs font-bold ${
+                    tailor.verified ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"
+                  }`}>
+                    {tailor.verified ? "Verified" : "Verification pending"}
+                  </span>
                   <p className="text-sm text-neutral-600">{(tailor.skills || []).join(", ") || "Skills not added"}</p>
                   <p className="flex items-center gap-1 text-sm font-semibold text-rosewood"><Star size={14} /> {tailor.rating || 0} - {tailor.priceRange || "Price on request"}</p>
                   {tailor.distanceKm && <p className="text-xs font-semibold text-neutral-500">{tailor.distanceKm} km away</p>}

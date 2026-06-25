@@ -28,7 +28,8 @@ const registerSchema = z.object({
 const loginSchema = z.object({
   body: z.object({
     email: z.string().email(),
-    password: z.string().min(1)
+    password: z.string().min(1),
+    role: z.enum(["customer", "tailor"]).optional()
   })
 });
 
@@ -39,20 +40,11 @@ const firebaseLoginSchema = z.object({
   })
 });
 
-async function createRoleProfile({ uid, name, email, phone, role }) {
-  const profile = {
-    uid,
-    name,
-    email,
-    phone,
-    role,
-    authProvider: "google",
-    createdAt: FieldValue.serverTimestamp(),
-    updatedAt: FieldValue.serverTimestamp()
-  };
+function rolesForUser(user = {}) {
+  return [...new Set([...(Array.isArray(user.roles) ? user.roles : []), user.role].filter(Boolean))];
+}
 
-  await db.collection("users").doc(uid).set(profile, { merge: true });
-
+async function upsertRoleProfile({ uid, name, email, phone, role, address = "", location = null }) {
   if (role === "customer") {
     await db.collection("customers").doc(uid).set(
       {
@@ -65,29 +57,71 @@ async function createRoleProfile({ uid, name, email, phone, role }) {
       },
       { merge: true }
     );
-  } else {
-    await db.collection("tailors").doc(uid).set(
-      {
-        uid,
-        name,
-        email,
-        phone,
-        shopName: "",
-        shopType: "Home-based",
-        verified: false,
-        availability: "available",
-        skills: [],
-        serviceFees: [],
-        rating: 0,
-        reviewCount: 0,
-        createdAt: FieldValue.serverTimestamp(),
-        updatedAt: FieldValue.serverTimestamp()
-      },
-      { merge: true }
-    );
+    return;
   }
 
-  await auth.setCustomUserClaims(uid, { role });
+  await db.collection("tailors").doc(uid).set(
+    {
+      uid,
+      name,
+      email,
+      phone,
+      shopName: name,
+      shopType: "Home-based",
+      address,
+      location,
+      verified: false,
+      availability: "available",
+      skills: [],
+      serviceFees: [],
+      rating: 0,
+      reviewCount: 0,
+      createdAt: FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp()
+    },
+    { merge: true }
+  );
+}
+
+async function addRoleToUser({ uid, user, role, address = "", location = null }) {
+  const roles = [...new Set([...rolesForUser(user), role])];
+  await upsertRoleProfile({
+    uid,
+    name: user.name,
+    email: user.email,
+    phone: user.phone || "",
+    role,
+    address,
+    location
+  });
+  await db.collection("users").doc(uid).set(
+    {
+      roles,
+      role,
+      updatedAt: FieldValue.serverTimestamp()
+    },
+    { merge: true }
+  );
+  await auth.setCustomUserClaims(uid, { role, roles });
+  return { ...user, uid, role, roles };
+}
+
+async function createRoleProfile({ uid, name, email, phone, role, authProvider = "google" }) {
+  const profile = {
+    uid,
+    name,
+    email,
+    phone,
+    role,
+    roles: [role],
+    authProvider,
+    createdAt: FieldValue.serverTimestamp(),
+    updatedAt: FieldValue.serverTimestamp()
+  };
+
+  await db.collection("users").doc(uid).set(profile, { merge: true });
+  await upsertRoleProfile({ uid, name, email, phone, role });
+  await auth.setCustomUserClaims(uid, { role, roles: [role] });
   return profile;
 }
 
@@ -97,24 +131,63 @@ router.post(
   asyncHandler(async (req, res) => {
     const { name, email, password, phone, role, address, location } = req.validated.body;
 
-    // Check if email already registered
+    let existingUserRecord = null;
     try {
-      await auth.getUserByEmail(email);
-      throw new HttpError(409, "An account with this email already exists");
+      existingUserRecord = await auth.getUserByEmail(email);
     } catch (err) {
-      if (err.status === 409) throw err;
-      // auth/user-not-found is expected — continue
+      if (err.code !== "auth/user-not-found") throw err;
     }
 
-    // Do NOT pass phoneNumber to Firebase Auth — it requires E.164 format (+91XXXXXXXXXX)
-    // and will throw if given a plain 10-digit number. We store phone in Firestore only.
+    if (existingUserRecord) {
+      const userDoc = await db.collection("users").doc(existingUserRecord.uid).get();
+      if (!userDoc.exists) {
+        throw new HttpError(401, "User profile not found");
+      }
+
+      const existingUser = userDoc.data();
+      if (!existingUser.passwordHash) {
+        throw new HttpError(401, "This email uses Google login. Continue with Google to add another role.");
+      }
+
+      const ok = await bcrypt.compare(password, existingUser.passwordHash);
+      if (!ok) {
+        throw new HttpError(401, "Invalid email or password");
+      }
+
+      const userWithRole = await addRoleToUser({
+        uid: existingUserRecord.uid,
+        user: {
+          uid: existingUserRecord.uid,
+          ...existingUser,
+          name: existingUser.name || name,
+          email,
+          phone: existingUser.phone || phone
+        },
+        role,
+        address: address || "",
+        location: location || null
+      });
+      const token = signAppToken(userWithRole);
+      return res.status(200).json({
+        token,
+        user: {
+          uid: existingUserRecord.uid,
+          name: userWithRole.name,
+          email: userWithRole.email,
+          phone: userWithRole.phone || "",
+          role,
+          roles: userWithRole.roles
+        }
+      });
+    }
+
     const firebaseUser = await auth.createUser({
       email,
       password,
-      displayName: name,
+      displayName: name
     });
 
-    await auth.setCustomUserClaims(firebaseUser.uid, { role });
+    await auth.setCustomUserClaims(firebaseUser.uid, { role, roles: [role] });
     const passwordHash = await bcrypt.hash(password, 12);
     const profile = {
       uid: firebaseUser.uid,
@@ -122,47 +195,27 @@ router.post(
       email,
       phone,
       role,
+      roles: [role],
       passwordHash,
       createdAt: FieldValue.serverTimestamp(),
       updatedAt: FieldValue.serverTimestamp()
     };
 
     await db.collection("users").doc(firebaseUser.uid).set(profile);
-
-    if (role === "customer") {
-      await db.collection("customers").doc(firebaseUser.uid).set({
-        uid: firebaseUser.uid,
-        name,
-        email,
-        phone,
-        createdAt: FieldValue.serverTimestamp(),
-        updatedAt: FieldValue.serverTimestamp()
-      });
-    } else {
-      await db.collection("tailors").doc(firebaseUser.uid).set({
-        uid: firebaseUser.uid,
-        name,
-        email,
-        phone,
-        shopName: name,
-        shopType: "Home-based",
-        address: address || "",
-        location: location || null,
-        verified: false,
-        availability: "available",
-        skills: [],
-        serviceFees: [],
-        rating: 0,
-        reviewCount: 0,
-        createdAt: FieldValue.serverTimestamp(),
-        updatedAt: FieldValue.serverTimestamp()
-      });
-    }
+    await upsertRoleProfile({
+      uid: firebaseUser.uid,
+      name,
+      email,
+      phone,
+      role,
+      address: address || "",
+      location: location || null
+    });
 
     const token = signAppToken({ uid: firebaseUser.uid, ...profile });
     res.status(201).json({
       token,
-      user: { uid: firebaseUser.uid, name, email, phone, role }
+      user: { uid: firebaseUser.uid, name, email, phone, role, roles: [role] }
     });
   })
 );
@@ -171,7 +224,7 @@ router.post(
   "/login",
   validate(loginSchema),
   asyncHandler(async (req, res) => {
-    const { email, password } = req.validated.body;
+    const { email, password, role } = req.validated.body;
     const userRecord = await auth.getUserByEmail(email);
     const userDoc = await db.collection("users").doc(userRecord.uid).get();
     if (!userDoc.exists) {
@@ -187,15 +240,22 @@ router.post(
       throw new HttpError(401, "Invalid email or password");
     }
 
-    const token = signAppToken(user);
+    const selectedRole = role || user.role || rolesForUser(user)[0] || "customer";
+    const userWithRole = await addRoleToUser({
+      uid: userRecord.uid,
+      user: { uid: userRecord.uid, ...user },
+      role: selectedRole
+    });
+    const token = signAppToken(userWithRole);
     res.json({
       token,
       user: {
-        uid: user.uid,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        role: user.role
+        uid: userRecord.uid,
+        name: userWithRole.name,
+        email: userWithRole.email,
+        phone: userWithRole.phone || "",
+        role: selectedRole,
+        roles: userWithRole.roles
       }
     });
   })
@@ -213,7 +273,11 @@ router.post(
 
     let user;
     if (userDoc.exists) {
-      user = userDoc.data();
+      user = await addRoleToUser({
+        uid: decoded.uid,
+        user: { uid: decoded.uid, ...userDoc.data() },
+        role
+      });
     } else {
       user = await createRoleProfile({
         uid: decoded.uid,
@@ -232,7 +296,8 @@ router.post(
         name: user.name,
         email: user.email,
         phone: user.phone || "",
-        role: user.role
+        role,
+        roles: user.roles || [role]
       }
     });
   })
