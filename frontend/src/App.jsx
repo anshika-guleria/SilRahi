@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Shell } from "./components/Shell";
 import { useAuth } from "./context/AuthContext";
 import { AdminPanel } from "./pages/AdminPanel";
@@ -8,6 +8,12 @@ import { Landing } from "./pages/Landing";
 import { TailorDashboard } from "./pages/TailorDashboard";
 import { TailorMap } from "./pages/TailorMap";
 import { TailorProfile } from "./pages/TailorProfile";
+
+function dashboardPageForRole(role) {
+  if (role === "tailor") return "tailor";
+  if (role === "admin") return "admin";
+  return "customer";
+}
 
 export default function App() {
   const { user } = useAuth();
@@ -19,6 +25,20 @@ export default function App() {
     setAuthRole(role);
     setPage("auth");
   }
+
+  useEffect(() => {
+    if (!user) return;
+
+    if (page === "auth" || page === "landing") {
+      setPage(dashboardPageForRole(user.role));
+      return;
+    }
+
+    const protectedPages = ["customer", "tailor", "admin"];
+    if (protectedPages.includes(page) && page !== dashboardPageForRole(user.role)) {
+      setPage(dashboardPageForRole(user.role));
+    }
+  }, [user, page]);
 
   function renderPage() {
     if (page === "auth") return <AuthPage setPage={setPage} initialRole={authRole} />;

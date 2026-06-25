@@ -9,6 +9,11 @@ export default {
       },
       fontFamily: {
         sans: ["Inter", "ui-sans-serif", "system-ui"]
+      },
+      animation: {
+        "bounce-slow": "bounce 3s infinite",
+        "spin-slow": "spin 6s linear infinite",
+        "pulse-slow": "pulse 3s cubic-bezier(0.4,0,0.6,1) infinite"
       }
     }
   },

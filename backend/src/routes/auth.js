@@ -96,11 +96,22 @@ router.post(
   validate(registerSchema),
   asyncHandler(async (req, res) => {
     const { name, email, password, phone, role, address, location } = req.validated.body;
+
+    // Check if email already registered
+    try {
+      await auth.getUserByEmail(email);
+      throw new HttpError(409, "An account with this email already exists");
+    } catch (err) {
+      if (err.status === 409) throw err;
+      // auth/user-not-found is expected — continue
+    }
+
+    // Do NOT pass phoneNumber to Firebase Auth — it requires E.164 format (+91XXXXXXXXXX)
+    // and will throw if given a plain 10-digit number. We store phone in Firestore only.
     const firebaseUser = await auth.createUser({
       email,
       password,
       displayName: name,
-      phoneNumber: phone.startsWith("+") ? phone : undefined
     });
 
     await auth.setCustomUserClaims(firebaseUser.uid, { role });
@@ -124,7 +135,8 @@ router.post(
         name,
         email,
         phone,
-        createdAt: FieldValue.serverTimestamp()
+        createdAt: FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp()
       });
     } else {
       await db.collection("tailors").doc(firebaseUser.uid).set({
@@ -132,7 +144,7 @@ router.post(
         name,
         email,
         phone,
-        shopName: "",
+        shopName: name,
         shopType: "Home-based",
         address: address || "",
         location: location || null,
@@ -147,8 +159,11 @@ router.post(
       });
     }
 
-    const token = signAppToken({ ...profile, uid: firebaseUser.uid });
-    res.status(201).json({ token, user: { uid: firebaseUser.uid, name, email, phone, role } });
+    const token = signAppToken({ uid: firebaseUser.uid, ...profile });
+    res.status(201).json({
+      token,
+      user: { uid: firebaseUser.uid, name, email, phone, role }
+    });
   })
 );
 
