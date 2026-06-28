@@ -20,10 +20,14 @@ const port = process.env.PORT || 5000;
 
 app.use(helmet());
 
+function normalizeOrigin(origin) {
+  return String(origin || "").trim().replace(/\/+$/, "");
+}
+
 // Support multiple frontend origins (handles Vite port shifting 5173→5174 etc.)
 const allowedOrigins = (process.env.FRONTEND_URL || "https://sil-rahi.vercel.app")
   .split(",")
-  .map((o) => o.trim())
+  .map(normalizeOrigin)
   .filter(Boolean)
   .concat(
     process.env.NODE_ENV === "production"
@@ -36,7 +40,7 @@ app.use(
     origin: (origin, callback) => {
       // Allow requests with no origin (e.g. curl, mobile apps, server-to-server)
       if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) return callback(null, true);
+      if (allowedOrigins.includes(normalizeOrigin(origin))) return callback(null, true);
       callback(new Error(`CORS: Origin ${origin} not allowed`));
     },
     credentials: true
