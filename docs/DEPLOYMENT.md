@@ -48,7 +48,7 @@ JWT_SECRET=<long-random-secret>
 JWT_EXPIRES_IN=7d
 FIREBASE_PROJECT_ID=<firebase-project-id>
 FIREBASE_CLIENT_EMAIL=<firebase-admin-client-email>
-FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+FIREBASE_PRIVATE_KEY=<escaped-private-key-from-firebase-service-account>
 FIREBASE_STORAGE_BUCKET=<firebase-project-id>.appspot.com
 ```
 
