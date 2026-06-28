@@ -63,7 +63,7 @@ ADMIN_NAME=Silrahi Admin
 After deployment, verify:
 
 ```text
-https://your-backend.onrender.com/api/health
+https://silrahi.onrender.com/api/health
 ```
 
 ## 3. Frontend on Vercel
@@ -80,7 +80,7 @@ Install command: npm ci
 Required environment variables:
 
 ```text
-VITE_API_URL=https://your-backend.onrender.com/api
+VITE_API_URL=https://silrahi.onrender.com/api
 VITE_FIREBASE_API_KEY=<web-api-key>
 VITE_FIREBASE_AUTH_DOMAIN=<project-id>.firebaseapp.com
 VITE_FIREBASE_PROJECT_ID=<project-id>

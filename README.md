@@ -72,7 +72,7 @@ Create `backend/.env` from `backend/.env.example`:
 ```env
 PORT=5000
 NODE_ENV=development
-FRONTEND_URL=http://localhost:5173
+FRONTEND_URL=https://sil-rahi.vercel.app
 JWT_SECRET=replace-with-a-long-random-secret
 JWT_EXPIRES_IN=7d
 FIREBASE_PROJECT_ID=your-project-id
@@ -87,7 +87,7 @@ ADMIN_NAME=Silrahi Admin
 Create `frontend/.env` from `frontend/.env.example`:
 
 ```env
-VITE_API_URL=http://localhost:5000/api
+VITE_API_URL=https://silrahi.onrender.com/api
 VITE_FIREBASE_API_KEY=your-web-api-key
 VITE_FIREBASE_AUTH_DOMAIN=your-project-id.firebaseapp.com
 VITE_FIREBASE_PROJECT_ID=your-project-id
@@ -127,13 +127,13 @@ npm run dev:frontend
 Open:
 
 ```text
-http://localhost:5173
+https://sil-rahi.vercel.app
 ```
 
 Health check:
 
 ```text
-http://localhost:5000/api/health
+https://silrahi.onrender.com/api/health
 ```
 
 For a deeper contributor setup guide, see [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
@@ -154,7 +154,7 @@ firebase deploy --only firestore:rules,storage
 
 ## API Overview
 
-Base URL: `http://localhost:5000/api`
+Base URL: `https://silrahi.onrender.com/api`
 
 | Method | Endpoint | Access |
 | --- | --- | --- |
