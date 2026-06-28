@@ -21,7 +21,7 @@ const port = process.env.PORT || 5000;
 app.use(helmet());
 
 // Support multiple frontend origins (handles Vite port shifting 5173→5174 etc.)
-const allowedOrigins = (process.env.FRONTEND_URL || "http://localhost:5173")
+const allowedOrigins = (process.env.FRONTEND_URL || "https://sil-rahi.vercel.app")
   .split(",")
   .map((o) => o.trim())
   .filter(Boolean)

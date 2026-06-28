@@ -14,7 +14,7 @@ services:
       - key: JWT_EXPIRES_IN
         value: 7d
       - key: FRONTEND_URL
-        sync: false
+        value: https://sil-rahi.vercel.app
       - key: JWT_SECRET
         generateValue: true
       - key: FIREBASE_PROJECT_ID
@@ -25,4 +25,3 @@ services:
         sync: false
       - key: FIREBASE_STORAGE_BUCKET
         sync: false
-

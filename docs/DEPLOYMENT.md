@@ -43,7 +43,7 @@ Required environment variables:
 
 ```text
 NODE_ENV=production
-FRONTEND_URL=https://your-frontend-domain.vercel.app
+FRONTEND_URL=https://sil-rahi.vercel.app
 JWT_SECRET=<long-random-secret>
 JWT_EXPIRES_IN=7d
 FIREBASE_PROJECT_ID=<firebase-project-id>
