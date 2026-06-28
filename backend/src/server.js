@@ -24,7 +24,12 @@ app.use(helmet());
 const allowedOrigins = (process.env.FRONTEND_URL || "http://localhost:5173")
   .split(",")
   .map((o) => o.trim())
-  .concat(["http://localhost:5174", "http://localhost:5175", "http://localhost:5176"]);
+  .filter(Boolean)
+  .concat(
+    process.env.NODE_ENV === "production"
+      ? []
+      : ["http://localhost:5174", "http://localhost:5175", "http://localhost:5176"]
+  );
 
 app.use(
   cors({
@@ -50,6 +55,10 @@ app.use(
 
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", service: "Silrahi API" });
+});
+
+app.get("/", (req, res) => {
+  res.json({ status: "ok", service: "Silrahi API", health: "/api/health" });
 });
 
 app.use("/api/auth", authRoutes);
@@ -96,13 +105,23 @@ async function ensureAdmin() {
   }
 }
 
-ensureAdmin()
-  .then(() => {
+async function startServer() {
+  await ensureAdmin();
+
+  if (process.env.VERCEL !== "1") {
     app.listen(port, () => {
       console.log(`Silrahi API running on http://localhost:${port}`);
     });
-  })
+  }
+}
+
+startServer()
   .catch((error) => {
     console.error("Failed to start Silrahi API", error);
+    if (process.env.VERCEL === "1") {
+      throw error;
+    }
     process.exit(1);
   });
+
+export default app;

@@ -29,7 +29,7 @@ const loginSchema = z.object({
   body: z.object({
     email: z.string().email(),
     password: z.string().min(1),
-    role: z.enum(["customer", "tailor"]).optional()
+    role: z.enum(["customer", "tailor", "admin"]).optional()
   })
 });
 
@@ -237,6 +237,25 @@ router.post(
     }
     const ok = await bcrypt.compare(password, user.passwordHash);
     if (!ok) {
+      throw new HttpError(401, "Invalid email or password");
+    }
+
+    if (user.role === "admin") {
+      const token = signAppToken({ uid: userRecord.uid, ...user, role: "admin", roles: ["admin"] });
+      return res.json({
+        token,
+        user: {
+          uid: userRecord.uid,
+          name: user.name,
+          email: user.email,
+          phone: user.phone || "",
+          role: "admin",
+          roles: ["admin"]
+        }
+      });
+    }
+
+    if (role === "admin") {
       throw new HttpError(401, "Invalid email or password");
     }
 

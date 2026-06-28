@@ -1,9 +1,9 @@
 # Silrahi
 
-[![CI](https://github.com/YOUR_USERNAME/YOUR_REPO_NAME/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_USERNAME/YOUR_REPO_NAME/actions/workflows/ci.yml)
+[![CI](https://github.com/Amit01-developer/SilRahi/actions/workflows/ci.yml/badge.svg)](https://github.com/Amit01-developer/SilRahi/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-Silrahi is a production-ready women-support platform for tailoring and sewing work. Customers can discover verified women tailors, book stitching orders with measurements and design references, track status, message the tailor, and review after delivery. Tailors can manage profile, pricing, work samples, availability, orders, and estimated earnings.
+Silrahi is a production-ready women-support platform for tailoring and sewing work. Customers can discover verified women tailors, book stitching orders with measurements and design references, visit the tailor's listed work location, track status, message the tailor, and review after completion. Tailors can manage profile, pricing, work samples, availability, orders, and estimated earnings.
 
 ## Tech Stack
 
@@ -25,13 +25,13 @@ Silrahi is a production-ready women-support platform for tailoring and sewing wo
 - Protected API routes with role checks
 - Tailor profile with photo, address, map coordinates, services, pricing, experience, availability, work samples, ratings, and reviews
 - Tailor signup and profile map pin support
-- Customer pickup location map pin support
+- Customer location map pin support for nearby tailor discovery
 - Customer search by text, service, availability, radius, location, rating, and price
 - Geolocation and clicked-pin based nearby tailor map with marker popups
-- Booking creation with delivery date, measurements, and cloth/design reference image
+- Booking creation with expected completion date, measurements, and cloth/design reference image
 - Order lifecycle: Pending, Accepted, Rejected, In Progress, Ready, Delivered, Cancelled
-- Customer dashboard: bookings, nearby/recommended tailors, saved tailors, profile settings, cancellation, review after delivery
-- Tailor dashboard: new orders, active orders, delivered orders, estimated earnings, profile management, work sample upload
+- Customer dashboard: bookings, nearby/recommended tailors, saved tailors, profile settings, cancellation, review after completion
+- Tailor dashboard: new orders, active orders, completed orders, estimated earnings, profile management, work sample upload
 - Firestore collections for `users`, `customers`, `tailors`, `bookings`, `reviews`, `messages`, and `notifications`
 - Firebase Firestore and Storage rules included
 - Vercel/Netlify/Firebase Hosting ready frontend build
@@ -55,6 +55,7 @@ newSilRahi/
       pages/           Landing, dashboards, map, profile, admin
       services/        API client
   docs/             Architecture and development guide
+  docs/DEPLOYMENT.md
   CONTRIBUTING.md
   CODE_OF_CONDUCT.md
   SECURITY.md
@@ -174,31 +175,14 @@ Base URL: `http://localhost:5000/api`
 | POST | `/bookings` | Customer |
 | GET | `/bookings` | Customer, Tailor, Admin |
 | PATCH | `/bookings/:id/status` | Customer cancel, Tailor/Admin update |
-| POST | `/reviews` | Customer after delivered order |
+| POST | `/reviews` | Customer after completed order |
 | GET | `/reviews/tailor/:tailorId` | Public |
 | GET | `/messages/:bookingId` | Booking participants |
 | POST | `/messages/:bookingId` | Booking participants |
 
 ## Deployment
 
-Frontend on Vercel or Netlify:
-
-```text
-Build command: npm run build --prefix frontend
-Publish directory: frontend/dist
-```
-
-Set all `VITE_*` variables in the hosting provider.
-
-Backend can be deployed to Render, Railway, Fly.io, or a VM:
-
-```text
-Start command: npm run start --prefix backend
-```
-
-Set backend env variables and update `FRONTEND_URL` to your deployed frontend domain. Set frontend `VITE_API_URL` to the deployed backend `/api` URL.
-
-Firebase Hosting is also configured through `firebase.json` with `frontend/dist` as the public folder.
+See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for the production setup.
 
 ## Verification
 
@@ -228,6 +212,7 @@ Contributions are welcome. Please read:
 - [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
 - [SECURITY.md](SECURITY.md)
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+- [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
 
 Good first contribution areas:
 
@@ -244,7 +229,7 @@ Before pushing this project to GitHub:
 1. Keep real secrets only in local `.env` files. Do not upload `backend/.env`, `frontend/.env`, Firebase private keys, or service-account JSON files.
 2. Commit `backend/.env.example` and `frontend/.env.example` only.
 3. Do not commit `node_modules/`, `frontend/dist/`, logs, caches, or editor folders. These are covered by `.gitignore`.
-4. Replace `YOUR_USERNAME/YOUR_REPO_NAME` in this README badge after creating the GitHub repository.
+4. Confirm the README badge points to the correct GitHub repository.
 5. If this folder is not already its own Git repository, create a clean standalone repo from inside `newSilRahi`:
 
 ```bash
@@ -252,7 +237,7 @@ git init
 git add .
 git commit -m "Initial Silrahi app"
 git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
+git remote add origin https://github.com/Amit01-developer/SilRahi.git
 git push -u origin main
 ```
 
@@ -266,6 +251,6 @@ npm run install:all
 
 - Public map results show verified tailors by default.
 - Customers can cancel only pending bookings.
-- Reviews require a delivered booking.
-- Tailor earnings are estimated from delivered orders and service fee entries.
+- Reviews require a completed booking.
+- Tailor earnings are estimated from completed orders and service fee entries.
 - Image uploads go to Firebase Storage through backend-validated endpoints.

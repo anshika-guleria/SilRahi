@@ -13,19 +13,43 @@ const bookingPayloadSchema = z.object({
   customerName: z.string().min(2),
   serviceType: z.string().min(2),
   description: z.string().min(3),
-  pickupDeliveryAddress: z.string().min(5),
+  pickupDeliveryAddress: z.string().optional(),
   deliveryDate: z.string().min(8),
   measurements: z.record(z.string()).optional()
 });
 
 const statusSchema = z.object({
   body: z.object({
-    status: z.enum(["pending", "accepted", "rejected", "in_progress", "ready", "delivered", "cancelled"])
+    status: z.enum(["pending", "accepted", "rejected", "in_progress", "ready", "delivered", "cancelled"]),
+    paymentAmount: z.preprocess(
+      (value) => (value === "" || value === undefined || value === null ? undefined : Number(value)),
+      z.number().min(0).optional()
+    )
+  })
+});
+
+const paymentSchema = z.object({
+  body: z.object({
+    method: z.enum(["upi", "cash", "other"]).default("upi"),
+    reference: z.string().max(120).optional()
   })
 });
 
 function bookingFromDoc(doc) {
   return { id: doc.id, ...doc.data() };
+}
+
+function amountFromFeeText(value) {
+  const match = String(value || "").replace(/,/g, "").match(/\d+(\.\d+)?/);
+  return match ? Number(match[0]) : 0;
+}
+
+function estimateBookingAmount(tailor, serviceType) {
+  const service = String(serviceType || "").toLowerCase();
+  const fee = (tailor.serviceFees || []).find((item) =>
+    service.includes(String(item.service || "").toLowerCase())
+  );
+  return amountFromFeeText(fee?.fee || tailor.priceRange);
 }
 
 router.post(
@@ -56,14 +80,39 @@ router.post(
       throw new HttpError(404, "Verified tailor not found");
     }
 
-    const referenceImageUrl = req.file ? await uploadBookingReference(req.user.uid, req.file) : "";
-    const ref = await db.collection("bookings").add({
+    const tailor = tailorDoc.data();
+    const visitAddress = tailor.address || "Tailor location";
+    const paymentAmount = estimateBookingAmount(tailor, data.serviceType);
+    let referenceImageUrl = "";
+    let referenceUploadFailed = false;
+    if (req.file) {
+      try {
+        referenceImageUrl = await uploadBookingReference(req.user.uid, req.file);
+      } catch {
+        referenceUploadFailed = true;
+      }
+    }
+    const bookingData = {
       ...data,
+      pickupDeliveryAddress: data.pickupDeliveryAddress || visitAddress,
+      visitAddress,
+      fulfillmentMode: "customer_visits_tailor"
+    };
+    delete bookingData.pickupDeliveryAddress;
+    const ref = await db.collection("bookings").add({
+      ...bookingData,
       customerId: req.user.uid,
       customerEmail: req.user.email,
-      tailorName: tailorDoc.data().name,
-      tailorPhone: tailorDoc.data().phone || "",
+      tailorName: tailor.name,
+      tailorPhone: tailor.phone || "",
+      paymentAmount,
+      paymentStatus: "unpaid",
+      paymentMethod: "",
+      paymentReference: "",
+      paymentUpiId: tailor.paymentUpiId || "",
+      paymentPhone: tailor.paymentPhone || tailor.phone || "",
       referenceImageUrl,
+      referenceUploadFailed,
       status: "pending",
       createdAt: FieldValue.serverTimestamp(),
       updatedAt: FieldValue.serverTimestamp()
@@ -80,6 +129,48 @@ router.post(
 
     const doc = await ref.get();
     res.status(201).json({ booking: bookingFromDoc(doc) });
+  })
+);
+
+router.patch(
+  "/:id/payment",
+  requireAuth,
+  requireRole("customer"),
+  validate(paymentSchema),
+  asyncHandler(async (req, res) => {
+    const doc = await db.collection("bookings").doc(req.params.id).get();
+    if (!doc.exists) {
+      throw new HttpError(404, "Booking not found");
+    }
+
+    const booking = doc.data();
+    if (booking.customerId !== req.user.uid) {
+      throw new HttpError(403, "Cannot pay for another customer's booking");
+    }
+    if (!["ready", "delivered"].includes(booking.status)) {
+      throw new HttpError(400, "Payment is available only after the tailor marks the work ready");
+    }
+
+    const payment = {
+      paymentStatus: "paid",
+      paymentMethod: req.validated.body.method,
+      paymentReference: req.validated.body.reference || "",
+      paidAt: FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp()
+    };
+
+    await doc.ref.update(payment);
+    await db.collection("notifications").add({
+      userId: booking.tailorId,
+      type: "payment_received",
+      title: "Payment received",
+      body: `${booking.customerName} marked payment for ${booking.serviceType}`,
+      read: false,
+      createdAt: FieldValue.serverTimestamp()
+    });
+
+    const updated = await doc.ref.get();
+    res.json({ booking: bookingFromDoc(updated) });
   })
 );
 
@@ -114,6 +205,7 @@ router.patch(
 
     const booking = doc.data();
     const nextStatus = req.validated.body.status;
+    const nextPaymentAmount = req.validated.body.paymentAmount;
 
     if (req.user.role === "customer") {
       if (booking.customerId !== req.user.uid) {
@@ -136,15 +228,26 @@ router.patch(
       throw new HttpError(403, "You do not have permission for this action");
     }
 
-    await doc.ref.update({
+    const update = {
       status: nextStatus,
       updatedAt: FieldValue.serverTimestamp()
-    });
+    };
+    if (nextStatus === "ready") {
+      update.paymentDue = true;
+      update.paymentRequestedAt = FieldValue.serverTimestamp();
+      if (nextPaymentAmount !== undefined) {
+        update.paymentAmount = nextPaymentAmount;
+      }
+    }
+    await doc.ref.update(update);
     await db.collection("notifications").add({
       userId: booking.customerId,
       type: "booking_status",
-      title: "Order status updated",
-      body: `${booking.serviceType} is now ${nextStatus.replace("_", " ")}`,
+      title: nextStatus === "ready" ? "Work ready - payment due" : "Order status updated",
+      body:
+        nextStatus === "ready"
+          ? `${booking.serviceType} is ready. Please pay ₹${nextPaymentAmount ?? booking.paymentAmount ?? 0} to the tailor and collect your clothes.`
+          : `${booking.serviceType} is now ${nextStatus.replace("_", " ")}`,
       read: false,
       createdAt: FieldValue.serverTimestamp()
     });

@@ -1,4 +1,4 @@
-import { CalendarCheck, CheckCircle2, Clock3, MapPin, Search, XCircle } from "lucide-react";
+import { CalendarCheck, CheckCircle2, Clock3, IndianRupee, MapPin, Search, XCircle } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "../components/Button";
 import { Field, inputClass } from "../components/Field";
@@ -120,6 +120,24 @@ export function CustomerDashboard({ setPage }) {
     }
   }
 
+  async function payBooking(booking) {
+    setMessage("");
+    setError("");
+    try {
+      const amount = Number(booking.paymentAmount || 0);
+      if (booking.paymentUpiId && amount > 0) {
+        const upiUrl = `upi://pay?pa=${encodeURIComponent(booking.paymentUpiId)}&pn=${encodeURIComponent(booking.tailorName || "Silrahi Tailor")}&am=${amount}&cu=INR&tn=${encodeURIComponent(`${booking.serviceType} booking`)}`;
+        window.location.href = upiUrl;
+      }
+      const reference = window.prompt("Payment reference / UPI transaction ID (optional)") || "";
+      await api.markBookingPaid(booking.id, { method: booking.paymentUpiId ? "upi" : "cash", reference });
+      setMessage("Payment marked as paid.");
+      await load();
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
   function updateReview(bookingId, field, value) {
     setReviews((current) => ({
       ...current,
@@ -172,31 +190,37 @@ export function CustomerDashboard({ setPage }) {
   }
 
   return (
-    <main className="mx-auto max-w-7xl px-4 py-8">
-      <div className="mb-6 flex flex-col justify-between gap-4 rounded-lg border border-pink-100 bg-white p-6 shadow-sm md:flex-row md:items-center">
-        <div>
-          <p className="font-semibold text-rosewood">Customer Dashboard</p>
-          <h1 className="text-3xl font-extrabold text-neutral-950">Welcome, {user.name}</h1>
-          <p className="mt-1 text-neutral-600">Manage bookings, profile details, and nearby stitching services.</p>
+    <main className="min-h-screen bg-[#fafafa]">
+      {/* dark header */}
+      <div className="bg-gradient-to-r from-neutral-950 via-[#1a0a1f] to-[#0f0a1e] px-4 py-10 relative overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(190,24,93,0.15),transparent_60%)]" />
+        <div className="relative mx-auto max-w-7xl flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-xs font-bold text-pink-400 uppercase tracking-widest mb-1">Customer Dashboard</p>
+            <h1 className="text-3xl font-extrabold text-white">Welcome, {user.name}</h1>
+            <p className="mt-1 text-neutral-400 text-sm">Manage bookings, profile, and nearby stitching services.</p>
+          </div>
+          <button onClick={() => setPage("map")}
+            className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-rosewood to-pink-600 text-white font-bold px-6 py-3 text-sm hover:opacity-90 transition-opacity shadow-lg w-fit">
+            <Search size={16} /> Search Tailors
+          </button>
         </div>
-        <Button onClick={() => setPage("map")}>
-          <Search size={18} />
-          Search Tailors
-        </Button>
       </div>
 
-      {error && <p className="mb-4 rounded-lg bg-red-50 p-3 font-semibold text-red-700">{error}</p>}
-      {message && <p className="mb-4 rounded-lg bg-emerald-50 p-3 font-semibold text-emerald-700">{message}</p>}
+      <div className="mx-auto max-w-7xl px-4 py-8">
+
+      {error && <p className="mb-4 rounded-xl bg-red-50 border border-red-200 p-3 font-semibold text-red-700">{error}</p>}
+      {message && <p className="mb-4 rounded-xl bg-emerald-50 border border-emerald-200 p-3 font-semibold text-emerald-700">{message}</p>}
 
       <section className="mb-6 grid gap-4 md:grid-cols-4">
         {[
-          ["Total bookings", computedStats.totalBookings, CalendarCheck, "bg-pink-50 text-rosewood"],
-          ["Active", computedStats.activeBookings, Clock3, "bg-blue-50 text-blue-700"],
-          ["Delivered", computedStats.deliveredBookings, CheckCircle2, "bg-emerald-50 text-emerald-700"],
-          ["Cancelled", computedStats.cancelledBookings, XCircle, "bg-neutral-100 text-neutral-700"]
+          ["Total bookings", computedStats.totalBookings, CalendarCheck, "bg-pink-50 text-rosewood border-pink-100"],
+          ["Active", computedStats.activeBookings, Clock3, "bg-blue-50 text-blue-700 border-blue-100"],
+          ["Delivered", computedStats.deliveredBookings, CheckCircle2, "bg-emerald-50 text-emerald-700 border-emerald-100"],
+          ["Cancelled", computedStats.cancelledBookings, XCircle, "bg-neutral-100 text-neutral-700 border-neutral-200"]
         ].map(([label, value, Icon, color]) => (
-          <article key={label} className="rounded-lg border border-pink-100 bg-white p-4 shadow-sm">
-            <div className={`mb-3 grid h-10 w-10 place-items-center rounded-lg ${color}`}>
+          <article key={label} className="rounded-2xl border border-neutral-100 bg-white p-5 shadow-sm hover:shadow-md transition-shadow">
+            <div className={`mb-3 grid h-11 w-11 place-items-center rounded-xl border ${color}`}>
               <Icon size={18} />
             </div>
             <p className="text-sm font-semibold text-neutral-500">{label}</p>
@@ -206,7 +230,7 @@ export function CustomerDashboard({ setPage }) {
       </section>
 
       <div className="grid gap-6 lg:grid-cols-[0.9fr_1.4fr]">
-        <section className="rounded-lg border border-pink-100 bg-white p-6 shadow-sm">
+        <section className="rounded-2xl border border-neutral-100 bg-white p-6 shadow-sm">
           <h2 className="text-xl font-extrabold text-neutral-950">Profile</h2>
           <form onSubmit={saveProfile} className="mt-4 grid gap-4">
             <Field label="Name">
@@ -215,10 +239,10 @@ export function CustomerDashboard({ setPage }) {
             <Field label="Phone">
               <input className={inputClass} value={profile.phone || ""} onChange={(e) => update("phone", e.target.value)} required />
             </Field>
-            <Field label="Default pickup address">
+            <Field label="Your area / address">
               <textarea className={inputClass} value={profile.address || ""} onChange={(e) => update("address", e.target.value)} />
             </Field>
-            <LocationPicker value={profile.location} onChange={(location) => update("location", location)} actionLabel="Use pickup location" />
+            <LocationPicker value={profile.location} onChange={(location) => update("location", location)} actionLabel="Use my location" />
             <Button disabled={saving}>{saving ? "Saving..." : "Save Profile"}</Button>
           </form>
 
@@ -256,7 +280,7 @@ export function CustomerDashboard({ setPage }) {
           </div>
         </section>
 
-        <section className="rounded-lg border border-pink-100 bg-white p-6 shadow-sm">
+        <section className="rounded-2xl border border-neutral-100 bg-white p-6 shadow-sm">
           <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
             <div>
               <h2 className="text-xl font-extrabold text-neutral-950">Your bookings</h2>
@@ -266,21 +290,41 @@ export function CustomerDashboard({ setPage }) {
           </div>
           <div className="mt-4 grid gap-3">
             {!loading && bookings.length === 0 && (
-              <div className="rounded-lg border border-dashed border-pink-200 p-6 text-center">
+              <div className="rounded-2xl border border-dashed border-neutral-200 p-8 text-center">
                 <p className="font-bold text-neutral-950">No bookings yet.</p>
-                <p className="mt-1 text-sm text-neutral-600">Find a tailor and create your first stitching request.</p>
-                <Button onClick={() => setPage("map")} className="mt-4">Find Tailors</Button>
+                <p className="mt-1 text-sm text-neutral-500">Find a tailor and create your first stitching request.</p>
+                <button onClick={() => setPage("map")} className="mt-4 rounded-xl bg-gradient-to-r from-rosewood to-pink-600 text-white font-bold px-6 py-2.5 text-sm hover:opacity-90 transition-opacity">Find Tailors</button>
               </div>
             )}
-            {loading && <p className="rounded-lg bg-pink-50 p-4 font-semibold text-rosewood">Loading dashboard...</p>}
+            {loading && <p className="rounded-xl bg-pink-50 p-4 font-semibold text-rosewood">Loading dashboard...</p>}
             {bookings.map((booking) => (
-              <article key={booking.id} className="rounded-lg border border-pink-100 p-4">
+              <article key={booking.id} className="rounded-2xl border border-neutral-100 p-4 hover:shadow-sm transition-shadow">
                 <div className="flex flex-col justify-between gap-3 md:flex-row">
                   <div>
                     <h3 className="font-bold text-neutral-950">{booking.serviceType}</h3>
                     <p className="text-sm text-neutral-600">{booking.tailorName || "Tailor"} - {booking.deliveryDate || booking.preferredDate}</p>
                     <p className="mt-2 text-sm">{booking.description}</p>
-                    <p className="mt-1 text-xs font-semibold text-neutral-500">{booking.pickupDeliveryAddress}</p>
+                    <p className="mt-1 text-xs font-semibold text-neutral-500">
+                      Visit tailor at: {booking.visitAddress || booking.pickupDeliveryAddress || "Tailor location"}
+                    </p>
+                    {["ready", "delivered"].includes(booking.status) && (
+                      <div className="mt-2 rounded-xl bg-neutral-50 px-3 py-2 text-xs font-bold text-neutral-700">
+                        <p className="inline-flex items-center gap-1">
+                          <IndianRupee size={13} />
+                          {booking.paymentAmount ? `₹${booking.paymentAmount}` : "Amount to be confirmed"} · {booking.paymentStatus === "paid" ? "Paid" : "Payment due"}
+                        </p>
+                        {booking.paymentStatus !== "paid" && (
+                          <p className="mt-1 font-semibold text-rosewood">
+                            Work ready. Pay this amount to collect your clothes.
+                          </p>
+                        )}
+                        {(booking.paymentUpiId || booking.paymentPhone) && booking.paymentStatus !== "paid" && (
+                          <p className="mt-1 font-semibold text-neutral-500">
+                            Pay via {booking.paymentUpiId || booking.paymentPhone}
+                          </p>
+                        )}
+                      </div>
+                    )}
                   </div>
                   <div className="flex flex-col items-start gap-2 md:items-end">
                     <span className={`rounded-full border px-3 py-1 text-sm font-bold capitalize ${statusStyles[booking.status] || statusStyles.pending}`}>
@@ -289,6 +333,12 @@ export function CustomerDashboard({ setPage }) {
                     {booking.status === "pending" && (
                       <Button type="button" variant="secondary" onClick={() => cancelBooking(booking.id)}>
                         Cancel
+                      </Button>
+                    )}
+                    {booking.paymentStatus !== "paid" && ["ready", "delivered"].includes(booking.status) && (
+                      <Button type="button" onClick={() => payBooking(booking)}>
+                        <IndianRupee size={16} />
+                        Pay Tailor
                       </Button>
                     )}
                   </div>
@@ -313,6 +363,7 @@ export function CustomerDashboard({ setPage }) {
             ))}
           </div>
         </section>
+      </div>
       </div>
     </main>
   );

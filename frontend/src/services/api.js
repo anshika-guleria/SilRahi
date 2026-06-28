@@ -44,8 +44,10 @@ export const api = {
       method: "POST",
       body: payload instanceof FormData ? payload : JSON.stringify(payload)
     }),
-  updateBookingStatus: (id, status) =>
-    request(`/bookings/${id}/status`, { method: "PATCH", body: JSON.stringify({ status }) }),
+  updateBookingStatus: (id, status, extra = {}) =>
+    request(`/bookings/${id}/status`, { method: "PATCH", body: JSON.stringify({ status, ...extra }) }),
+  markBookingPaid: (id, payload) =>
+    request(`/bookings/${id}/payment`, { method: "PATCH", body: JSON.stringify(payload) }),
   createReview: (payload) => request("/reviews", { method: "POST", body: JSON.stringify(payload) }),
   reviews: (tailorId) => request(`/reviews/tailor/${tailorId}`),
   messages: (bookingId) => request(`/messages/${bookingId}`),

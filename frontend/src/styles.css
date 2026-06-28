@@ -1,13 +1,31 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-  margin: 0;
-  background: #fff7fb;
-  color: #171717;
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    margin: 0;
+    background: #fafafa;
+    color: #171717;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer utilities {
+  /* ensure these arbitrary opacity classes are always generated */
+  .text-rosewood { color: #be185d; }
+  .bg-rosewood { background-color: #be185d; }
+  .text-amethyst { color: #7c3aed; }
+  .bg-amethyst { background-color: #7c3aed; }
 }
 
 .glass {
@@ -17,6 +35,16 @@ body {
 
 .map-panel {
   min-height: 440px;
+}
+
+/* Smooth page transitions */
+main {
+  animation: fadeUp 0.4s ease;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .leaflet-container {

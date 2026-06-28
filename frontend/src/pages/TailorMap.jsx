@@ -130,8 +130,18 @@ export function TailorMap({ setPage, setSelectedTailor }) {
    }
 
   return (
-    <main className="mx-auto max-w-7xl px-4 py-8">
-      <div className="mb-5 grid gap-4 rounded-lg border border-pink-100 bg-white p-4 shadow-sm lg:grid-cols-[1.1fr_0.9fr_0.7fr_0.7fr_0.6fr_auto_auto]">
+    <main className="min-h-screen bg-[#fafafa]">
+      {/* page header */}
+      <div className="bg-gradient-to-r from-neutral-950 via-[#1a0a1f] to-[#0f0a1e] px-4 py-8 relative overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(190,24,93,0.15),transparent_60%)]" />
+        <div className="relative mx-auto max-w-7xl">
+          <h1 className="text-2xl font-extrabold text-white">Find Tailors Near You</h1>
+          <p className="mt-1 text-sm text-neutral-400">Use the map or search to discover verified women tailors</p>
+        </div>
+      </div>
+
+      <div className="mx-auto max-w-7xl px-4 py-6">
+      <div className="mb-5 grid gap-4 rounded-2xl border border-neutral-100 bg-white p-4 shadow-sm lg:grid-cols-[1.1fr_0.9fr_0.7fr_0.7fr_0.6fr_auto_auto]">
         <Field label="Search">
           <input className={inputClass} placeholder="name, shop, area..." value={filters.search} onChange={(e) => update("search", e.target.value)} />
         </Field>
@@ -168,7 +178,7 @@ export function TailorMap({ setPage, setSelectedTailor }) {
           Near me
         </Button>
       </div>
-      <div className="mb-4 flex flex-col justify-between gap-2 rounded-lg border border-pink-100 bg-white px-4 py-3 text-sm font-semibold text-neutral-600 shadow-sm sm:flex-row sm:items-center">
+      <div className="mb-4 flex flex-col justify-between gap-2 rounded-2xl border border-neutral-100 bg-white px-4 py-3 text-sm font-semibold text-neutral-600 shadow-sm sm:flex-row sm:items-center">
         <span className="flex items-center gap-2">
           <MapPin size={16} />
           {location
@@ -181,9 +191,9 @@ export function TailorMap({ setPage, setSelectedTailor }) {
           </Button>
         )}
       </div>
-      {error && <p className="mb-4 rounded-lg bg-red-50 p-3 font-semibold text-red-700">{error}</p>}
+      {error && <p className="mb-4 rounded-xl bg-red-50 border border-red-200 p-3 font-semibold text-red-700">{error}</p>}
       <div className="grid gap-5 lg:grid-cols-[1fr_360px]">
-        <div className="map-panel overflow-hidden rounded-lg border border-pink-100 bg-white p-2 shadow-sm">
+        <div className="map-panel overflow-hidden rounded-2xl border border-neutral-100 bg-white p-2 shadow-sm">
           <MapContainer center={center} zoom={location ? 13 : 12} scrollWheelZoom className="h-full" key={`${center[0]}-${center[1]}`}>
             <TileLayer attribution="OpenStreetMap" url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
             <SearchCenterPicker onChange={updateSearchLocation} />
@@ -207,20 +217,20 @@ export function TailorMap({ setPage, setSelectedTailor }) {
         </div>
         <aside className="space-y-3">
           {!loading && tailors.length === 0 && (
-            <div className="rounded-lg border border-dashed border-pink-200 bg-white p-6 text-center shadow-sm">
+            <div className="rounded-2xl border border-dashed border-neutral-200 bg-white p-6 text-center shadow-sm">
               <p className="font-bold text-neutral-950">No tailors found</p>
-              <p className="mt-1 text-sm text-neutral-600">Try a wider radius or another service.</p>
+              <p className="mt-1 text-sm text-neutral-500">Try a wider radius or another service.</p>
             </div>
           )}
           {tailors.map((tailor) => (
-            <article key={tailor.id} className="rounded-lg border border-pink-100 bg-white p-4 shadow-sm">
+            <article key={tailor.id} className="rounded-2xl border border-neutral-100 bg-white p-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
               <div className="flex gap-3">
                 <img src={tailor.profilePhotoUrl || "https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?auto=format&fit=crop&w=160&q=80"} className="h-16 w-16 rounded-lg object-cover" alt={tailor.name} />
                 <div>
                   <h3 className="font-bold">{tailor.name}</h3>
                   <p className="text-sm font-semibold text-neutral-700">{tailor.shopName || "Home tailor"} - {tailor.shopType || "Home-based"}</p>
-                  <span className={`mt-1 inline-flex rounded-full px-2 py-0.5 text-xs font-bold ${
-                    tailor.verified ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"
+              <span className={`mt-1 inline-flex rounded-full px-2.5 py-0.5 text-xs font-bold ${
+                    tailor.verified ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-amber-50 text-amber-700 border border-amber-100"
                   }`}>
                     {tailor.verified ? "Verified" : "Verification pending"}
                   </span>
@@ -230,7 +240,7 @@ export function TailorMap({ setPage, setSelectedTailor }) {
                 </div>
               </div>
               {(tailor.serviceFees || []).length > 0 && (
-                <div className="mt-3 grid gap-1 rounded-lg bg-pink-50 p-3 text-sm">
+                <div className="mt-3 grid gap-1 rounded-xl bg-neutral-50 border border-neutral-100 p-3 text-sm">
                   {(tailor.serviceFees || []).slice(0, 3).map((item, index) => (
                     <div key={`${item.service}-${index}`} className="flex justify-between gap-3">
                       <span>{item.service}</span>
@@ -246,6 +256,7 @@ export function TailorMap({ setPage, setSelectedTailor }) {
             </article>
           ))}
         </aside>
+      </div>
       </div>
     </main>
   );

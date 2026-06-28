@@ -33,6 +33,8 @@ const profileSchema = z.object({
       .optional(),
     experienceYears: z.number().min(0).max(80).optional(),
     priceRange: z.string().optional(),
+    paymentUpiId: z.string().max(100).optional(),
+    paymentPhone: z.string().max(15).optional(),
     availability: z.enum(["available", "busy", "offline"]).optional(),
     about: z.string().max(1000).optional(),
     workSamples: z.array(z.string().url()).optional()

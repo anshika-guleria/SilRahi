@@ -36,6 +36,8 @@ function emptyProfile(user) {
     serviceFees: [{ service: "Blouse", fee: "" }, { service: "Kurti", fee: "" }],
     experienceYears: 0,
     priceRange: "",
+    paymentUpiId: "",
+    paymentPhone: "",
     availability: "available",
     about: "",
     verified: false,
@@ -73,6 +75,8 @@ function buildTailorPayload(profile) {
       .filter((fee) => fee.service && fee.fee),
     experienceYears: Number(profile.experienceYears || 0),
     priceRange: String(profile.priceRange || "").trim(),
+    paymentUpiId: String(profile.paymentUpiId || "").trim(),
+    paymentPhone: String(profile.paymentPhone || "").trim(),
     availability: profile.availability || "available",
     about: String(profile.about || "").trim(),
     workSamples: (profile.workSamples || []).filter(validUrl)
@@ -124,6 +128,14 @@ function OrderCard({ booking, onStatus, onMessage }) {
             </span>
           </div>
           <p className="mt-0.5 text-sm text-neutral-500">{booking.customerName} · {booking.deliveryDate || booking.preferredDate}</p>
+          {["ready", "delivered"].includes(booking.status) && (
+            <p className={`mt-2 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold ${
+              booking.paymentStatus === "paid" ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"
+            }`}>
+              <IndianRupee size={12} />
+              {booking.paymentAmount ? `₹${booking.paymentAmount}` : "Amount pending"} · {booking.paymentStatus === "paid" ? "Paid" : "Payment due"}
+            </p>
+          )}
         </div>
         {open ? <ChevronUp size={18} className="text-neutral-400 flex-shrink-0 mt-1" /> : <ChevronDown size={18} className="text-neutral-400 flex-shrink-0 mt-1" />}
       </div>
@@ -131,8 +143,13 @@ function OrderCard({ booking, onStatus, onMessage }) {
       {open && (
         <div className="border-t border-pink-50 p-4 space-y-3">
           {booking.description && <p className="text-sm text-neutral-700">{booking.description}</p>}
-          {booking.pickupDeliveryAddress && (
-            <p className="text-xs text-neutral-500 flex items-center gap-1"><MapPin size={12}/>{booking.pickupDeliveryAddress}</p>
+          <p className="text-xs text-neutral-500 flex items-center gap-1">
+            <MapPin size={12}/>Customer will visit your listed tailor location.
+          </p>
+          {booking.paymentStatus === "paid" && (
+            <p className="text-xs font-semibold text-emerald-700">
+              Payment received{booking.paymentReference ? ` · Ref: ${booking.paymentReference}` : ""}
+            </p>
           )}
           {booking.referenceImageUrl && (
             <img src={booking.referenceImageUrl} alt="Reference" className="h-36 w-full object-cover rounded-xl" />
@@ -218,7 +235,7 @@ export function TailorDashboard() {
   const profileScore = useMemo(() => {
     const checks = [profile.name, profile.shopName, profile.phone, profile.address,
       profile.about, profile.priceRange, profile.skills?.length,
-      profile.serviceFees?.some(f=>f.service&&f.fee), profile.location?.lat];
+      profile.serviceFees?.some(f=>f.service&&f.fee), profile.paymentUpiId || profile.paymentPhone, profile.location?.lat];
     return Math.round(checks.filter(Boolean).length / checks.length * 100);
   }, [profile]);
 
@@ -261,7 +278,22 @@ export function TailorDashboard() {
   }
 
   async function onStatus(id, status) {
-    try { await api.updateBookingStatus(id, status); notify(`Marked: ${statusLabel(status)}`); await load(); }
+    try {
+      const extra = {};
+      if (status === "ready") {
+        const amount = window.prompt("Kitne rupaye ka work hua hai? Customer ko ye amount payment ke liye dikhega.");
+        if (amount === null) return;
+        const cleanAmount = Number(String(amount).replace(/[^\d.]/g, ""));
+        if (!Number.isFinite(cleanAmount) || cleanAmount <= 0) {
+          notify("Please enter a valid amount.", "error");
+          return;
+        }
+        extra.paymentAmount = cleanAmount;
+      }
+      await api.updateBookingStatus(id, status, extra);
+      notify(status === "ready" ? "Customer notified for payment." : `Marked: ${statusLabel(status)}`);
+      await load();
+    }
     catch(e) { notify(e.message,"error"); }
   }
 
@@ -411,6 +443,14 @@ export function TailorDashboard() {
               <Field label="Price Range">
                 <input className={inputClass} value={profile.priceRange||""} onChange={e=>upd("priceRange",e.target.value)} placeholder="e.g. ₹300 – ₹2500"/>
               </Field>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field label="UPI ID">
+                  <input className={inputClass} value={profile.paymentUpiId||""} onChange={e=>upd("paymentUpiId",e.target.value)} placeholder="name@upi"/>
+                </Field>
+                <Field label="Payment Phone">
+                  <input className={inputClass} value={profile.paymentPhone||""} onChange={e=>upd("paymentPhone",e.target.value)} placeholder="Payment mobile number"/>
+                </Field>
+              </div>
               <Field label="Address">
                 <textarea className={inputClass} rows={2} value={profile.address||""} onChange={e=>upd("address",e.target.value)} placeholder="Shop / home address"/>
               </Field>
