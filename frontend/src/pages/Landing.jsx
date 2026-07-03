@@ -134,8 +134,8 @@ function Step({ n, title, text, delay = 0 }) {
         {n}
       </div>
       <div className="pt-1">
-        <h4 className="font-bold text-neutral-900 text-sm">{title}</h4>
-        <p className="text-sm text-neutral-500 mt-1 leading-relaxed">{text}</p>
+        <h4 className="font-bold text-white text-sm">{title}</h4>
+        <p className="text-sm text-neutral-300 mt-1 leading-relaxed">{text}</p>
       </div>
     </div>
   );
