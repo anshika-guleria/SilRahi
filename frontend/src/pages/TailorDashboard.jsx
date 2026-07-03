@@ -7,6 +7,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "../components/Button";
 import { Field, inputClass } from "../components/Field";
 import { LocationPicker } from "../components/LocationPicker";
+import { DEFAULT_LOCATION } from "../constants/location";
 import { useAuth } from "../context/AuthContext";
 import { api } from "../services/api";
 
@@ -31,7 +32,7 @@ function emptyProfile(user) {
     shopType: "Home-based",
     phone: user?.phone || "",
     address: "",
-    location: { lat: 28.6139, lng: 77.209 },
+    location: { lat: DEFAULT_LOCATION.lat, lng: DEFAULT_LOCATION.lng },
     skills: [],
     serviceFees: [{ service: "Blouse", fee: "" }, { service: "Kurti", fee: "" }],
     experienceYears: 0,
@@ -95,11 +96,11 @@ function buildTailorPayload(profile) {
 /* ── Stat Card ── */
 function StatCard({ label, value, icon: Icon, color, loading }) {
   return (
-    <article className={`rounded-2xl border p-5 shadow-sm bg-white flex items-center gap-4`}>
-      <div className={`h-12 w-12 flex-shrink-0 rounded-xl flex items-center justify-center ${color}`}>
+    <article className={`flex items-center gap-3 rounded-2xl border bg-white p-4 shadow-sm sm:gap-4 sm:p-5`}>
+      <div className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl sm:h-12 sm:w-12 ${color}`}>
         <Icon size={22} />
       </div>
-      <div>
+      <div className="min-w-0">
         <p className="text-sm font-semibold text-neutral-500">{label}</p>
         <p className="text-3xl font-extrabold text-neutral-900">{loading ? "—" : value}</p>
       </div>
@@ -162,9 +163,9 @@ function OrderCard({ booking, onStatus, onMessage }) {
             </div>
           )}
           {!locked && (
-            <div className="flex gap-2">
+            <div className="grid gap-2 sm:flex">
               <input className={`${inputClass} flex-1 text-sm`} placeholder="Message to customer..." value={msg} onChange={e=>setMsg(e.target.value)} />
-              <Button variant="secondary" onClick={()=>{ onMessage(booking.id, msg); setMsg(""); }}><Send size={14}/></Button>
+              <Button variant="secondary" className="w-full sm:w-auto" onClick={()=>{ onMessage(booking.id, msg); setMsg(""); }}><Send size={14}/></Button>
             </div>
           )}
           {!locked && (
@@ -304,31 +305,31 @@ export function TailorDashboard() {
   }
 
   return (
-    <main className="mx-auto max-w-7xl px-4 py-8">
+    <main className="mx-auto max-w-7xl px-4 py-6 sm:py-8">
 
       {/* ── Toast ── */}
       {toast.msg && (
-        <div className={`fixed top-5 right-5 z-50 rounded-xl px-5 py-3 text-sm font-semibold shadow-lg transition-all
+        <div className={`fixed left-4 right-4 top-4 z-50 rounded-xl px-5 py-3 text-sm font-semibold shadow-lg transition-all sm:left-auto sm:right-5 sm:top-5
           ${toast.type==="error" ? "bg-red-600 text-white" : "bg-emerald-600 text-white"}`}>
           {toast.msg}
         </div>
       )}
 
       {/* ── Header ── */}
-      <div className="mb-6 rounded-2xl border border-pink-100 bg-white p-6 shadow-sm">
+      <div className="mb-6 rounded-2xl border border-pink-100 bg-white p-4 shadow-sm sm:p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-4">
+          <div className="flex min-w-0 items-center gap-3 sm:gap-4">
             {profile.profilePhotoUrl
-              ? <img src={profile.profilePhotoUrl} alt={profile.name} className="h-16 w-16 rounded-2xl object-cover ring-2 ring-pink-200" />
-              : <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-rosewood to-amethyst flex items-center justify-center text-white text-2xl font-extrabold">
+              ? <img src={profile.profilePhotoUrl} alt={profile.name} className="h-14 w-14 flex-shrink-0 rounded-2xl object-cover ring-2 ring-pink-200 sm:h-16 sm:w-16" />
+              : <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-rosewood to-amethyst text-2xl font-extrabold text-white sm:h-16 sm:w-16">
                   {profile.name?.[0] || "T"}
                 </div>
             }
-            <div>
+            <div className="min-w-0">
               <p className="text-sm font-semibold text-rosewood flex items-center gap-1">
                 <Scissors size={14}/> Tailor Dashboard
               </p>
-              <h1 className="text-2xl font-extrabold text-neutral-900">{profile.shopName || profile.name || "My Tailoring Business"}</h1>
+              <h1 className="break-words text-xl font-extrabold text-neutral-900 sm:text-2xl">{profile.shopName || profile.name || "My Tailoring Business"}</h1>
               <div className="mt-1 flex flex-wrap items-center gap-2">
                 <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-bold
                   ${profile.verified ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-amber-50 text-amber-700 border-amber-200"}`}>
@@ -347,9 +348,9 @@ export function TailorDashboard() {
               </div>
             </div>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="grid gap-2 sm:flex sm:flex-wrap">
             <button onClick={load} disabled={loading}
-              className="flex items-center gap-1.5 rounded-xl border border-pink-200 px-4 py-2 text-sm font-semibold text-rosewood hover:bg-pink-50 transition-colors">
+              className="flex items-center justify-center gap-1.5 rounded-xl border border-pink-200 px-4 py-2 text-sm font-semibold text-rosewood transition-colors hover:bg-pink-50">
               <RefreshCw size={14} className={loading?"animate-spin":""}/> Refresh
             </button>
             <div className="flex rounded-xl border border-pink-200 overflow-hidden text-sm font-semibold">
@@ -365,7 +366,7 @@ export function TailorDashboard() {
       </div>
 
       {/* ── Stats ── */}
-      <div className="mb-6 grid gap-4 grid-cols-2 md:grid-cols-5">
+      <div className="mb-6 grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 sm:gap-4 md:grid-cols-5">
         <StatCard label="Total Orders"   value={computedStats.totalOrders}     icon={PackageCheck} color="bg-pink-50 text-rosewood"     loading={loading}/>
         <StatCard label="Pending"        value={computedStats.pendingOrders}   icon={Clock3}       color="bg-amber-50 text-amber-700"   loading={loading}/>
         <StatCard label="Active"         value={computedStats.activeOrders}    icon={TrendingUp}   color="bg-blue-50 text-blue-700"     loading={loading}/>
@@ -375,12 +376,12 @@ export function TailorDashboard() {
 
       {/* ══ ORDERS TAB ══ */}
       {tab === "orders" && (
-        <div className="rounded-2xl border border-pink-100 bg-white p-6 shadow-sm">
+        <div className="rounded-2xl border border-pink-100 bg-white p-4 shadow-sm sm:p-6">
           <h2 className="text-xl font-extrabold text-neutral-900 mb-1">Customer Orders</h2>
           <p className="text-sm text-neutral-500 mb-5">Accept, update status, and message customers from here.</p>
           {loading && <p className="rounded-xl bg-pink-50 p-4 text-sm font-semibold text-rosewood">Loading orders...</p>}
           {!loading && bookings.length === 0 && (
-            <div className="rounded-2xl border-2 border-dashed border-pink-200 p-10 text-center">
+            <div className="rounded-2xl border-2 border-dashed border-pink-200 p-6 text-center sm:p-10">
               <Scissors size={36} className="mx-auto text-pink-200 mb-3"/>
               <p className="font-bold text-neutral-900">No orders yet</p>
               <p className="mt-1 text-sm text-neutral-500">Complete your profile so customers can find and book you.</p>
@@ -400,8 +401,8 @@ export function TailorDashboard() {
       {/* ══ PROFILE TAB ══ */}
       {tab === "profile" && (
         <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
-          <div className="rounded-2xl border border-pink-100 bg-white p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-1">
+          <div className="rounded-2xl border border-pink-100 bg-white p-4 shadow-sm sm:p-6">
+            <div className="mb-1 flex items-center justify-between gap-3">
               <h2 className="text-xl font-extrabold text-neutral-900">Edit Profile</h2>
               <span className="text-sm font-semibold text-rosewood">{profileScore}% complete</span>
             </div>
@@ -474,7 +475,7 @@ export function TailorDashboard() {
                 </div>
                 <div className="space-y-2">
                   {(profile.serviceFees||[]).map((f,i)=>(
-                    <div key={i} className="grid grid-cols-[1fr_1fr_auto] gap-2">
+                    <div key={i} className="grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
                       <input className={inputClass} placeholder="Service" value={f.service||""} onChange={e=>updFee(i,"service",e.target.value)}/>
                       <input className={inputClass} placeholder="Fee e.g. ₹500" value={f.fee||""} onChange={e=>updFee(i,"fee",e.target.value)}/>
                       <button type="button" onClick={()=>setProfile(p=>({...p,serviceFees:p.serviceFees.filter((_,fi)=>fi!==i)}))}

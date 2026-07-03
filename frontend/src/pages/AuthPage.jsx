@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Scissors, Sparkles } from "lucide-react";
 import { Field, inputClass } from "../components/Field";
 import { LocationPicker } from "../components/LocationPicker";
+import { DEFAULT_LOCATION } from "../constants/location";
 import { useAuth } from "../context/AuthContext";
 import { useLang } from "../context/LanguageContext";
 
@@ -24,7 +25,7 @@ export function AuthPage({ setPage, initialRole = "customer" }) {
   const [form, setForm] = useState({
     name: "", email: "", phone: "", password: "",
     role: initialRole, address: "",
-    location: { lat: 28.6139, lng: 77.209 },
+    location: { lat: DEFAULT_LOCATION.lat, lng: DEFAULT_LOCATION.lng },
   });
 
   useEffect(() => { update("role", initialRole); }, [initialRole]);
@@ -61,14 +62,14 @@ export function AuthPage({ setPage, initialRole = "customer" }) {
   const roleOptions = [["customer", t.roleCustomer], ["tailor", t.roleTailor]];
 
   return (
-    <main className="min-h-[calc(100vh-64px)] bg-gradient-to-br from-neutral-950 via-[#1a0a1f] to-[#0f0a1e] flex items-center justify-center px-4 py-12 relative overflow-hidden">
+    <main className="relative flex min-h-[calc(100svh-60px)] items-center justify-center overflow-hidden bg-gradient-to-br from-neutral-950 via-[#1a0a1f] to-[#0f0a1e] px-4 py-8 sm:py-12">
       {/* blobs */}
       <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 h-[400px] w-[500px] rounded-full bg-rosewood/15 blur-[100px]" />
       <div className="pointer-events-none absolute bottom-0 right-0 h-64 w-64 rounded-full bg-amethyst/10 blur-[80px]" />
 
       <div className="relative w-full max-w-md">
         {/* logo */}
-        <div className="flex flex-col items-center mb-8">
+        <div className="mb-6 flex flex-col items-center sm:mb-8">
           <div className="h-12 w-12 rounded-2xl bg-rosewood/20 border border-rosewood/30 flex items-center justify-center mb-3">
             <Scissors size={22} className="text-pink-400" />
           </div>
@@ -79,7 +80,7 @@ export function AuthPage({ setPage, initialRole = "customer" }) {
           </p>
         </div>
 
-        <div className="rounded-2xl border border-neutral-700 bg-neutral-900 backdrop-blur-md p-7 shadow-2xl">
+        <div className="rounded-2xl border border-neutral-700 bg-neutral-900 p-5 shadow-2xl backdrop-blur-md sm:p-7">
           {/* mode tabs */}
           <div className="mb-6 flex rounded-xl bg-neutral-800 p-1">
             {["login", "signup"].map((item) => (
@@ -94,7 +95,7 @@ export function AuthPage({ setPage, initialRole = "customer" }) {
           {/* role selector */}
           <div className="mb-5 rounded-xl border border-neutral-700 bg-neutral-800 p-4">
             <p className="mb-3 text-xs font-bold text-neutral-400 uppercase tracking-widest">{t.roleLabel}</p>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid gap-2 min-[360px]:grid-cols-2">
               {roleOptions.map(([role, label]) => (
                 <button key={role} type="button" onClick={() => update("role", role)}
                   className={`rounded-xl px-3 py-2.5 text-sm font-bold transition-all

@@ -2,8 +2,7 @@ import L from "leaflet";
 import { Crosshair, MapPin } from "lucide-react";
 import { MapContainer, Marker, TileLayer, useMapEvents } from "react-leaflet";
 import { Button } from "./Button";
-
-const defaultCenter = { lat: 28.6139, lng: 77.209 };
+import { DEFAULT_LOCATION } from "../constants/location";
 
 const markerIcon = new L.Icon({
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
@@ -21,7 +20,7 @@ function PinEvents({ onChange }) {
 }
 
 export function LocationPicker({ value, onChange, className = "", actionLabel = "Use my location" }) {
-  const selected = value?.lat && value?.lng ? { lat: Number(value.lat), lng: Number(value.lng) } : defaultCenter;
+  const selected = value?.lat && value?.lng ? { lat: Number(value.lat), lng: Number(value.lng) } : DEFAULT_LOCATION;
 
   function useCurrentLocation() {
     if (!navigator.geolocation) return;
@@ -37,11 +36,11 @@ export function LocationPicker({ value, onChange, className = "", actionLabel = 
   return (
     <div className={`overflow-hidden rounded-lg border border-pink-100 bg-white ${className}`}>
       <div className="flex flex-col justify-between gap-3 border-b border-pink-100 p-3 sm:flex-row sm:items-center">
-        <p className="flex items-center gap-2 text-sm font-bold text-neutral-700">
+        <p className="flex items-start gap-2 text-sm font-bold text-neutral-700 sm:items-center">
           <MapPin size={16} />
-          Click on the map to place the pin
+          <span>Click on the map to place the pin</span>
         </p>
-        <Button type="button" variant="secondary" onClick={useCurrentLocation}>
+        <Button type="button" variant="secondary" onClick={useCurrentLocation} className="w-full sm:w-auto">
           <Crosshair size={18} />
           {actionLabel}
         </Button>

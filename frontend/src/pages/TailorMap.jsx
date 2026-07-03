@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { MapContainer, Marker, Popup, TileLayer, useMapEvents } from "react-leaflet";
 import { Button } from "../components/Button";
 import { Field, inputClass } from "../components/Field";
+import { DEFAULT_LOCATION } from "../constants/location";
 import { api } from "../services/api";
 
 const markerIcon = new L.Icon({
@@ -34,7 +35,7 @@ export function TailorMap({ setPage, setSelectedTailor }) {
   const [location, setLocation] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const center = useMemo(() => (location ? [location.lat, location.lng] : [28.6139, 77.209]), [location]);
+  const center = useMemo(() => (location ? [location.lat, location.lng] : [DEFAULT_LOCATION.lat, DEFAULT_LOCATION.lng]), [location]);
 
   async function load(nextLocation = location) {
     setLoading(true);
@@ -132,16 +133,16 @@ export function TailorMap({ setPage, setSelectedTailor }) {
   return (
     <main className="min-h-screen bg-[#fafafa]">
       {/* page header */}
-      <div className="bg-gradient-to-r from-neutral-950 via-[#1a0a1f] to-[#0f0a1e] px-4 py-8 relative overflow-hidden">
+      <div className="relative overflow-hidden bg-gradient-to-r from-neutral-950 via-[#1a0a1f] to-[#0f0a1e] px-4 py-7 sm:py-8">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(190,24,93,0.15),transparent_60%)]" />
         <div className="relative mx-auto max-w-7xl">
-          <h1 className="text-2xl font-extrabold text-white">Find Tailors Near You</h1>
+          <h1 className="text-2xl font-extrabold text-white sm:text-3xl">Find Tailors Near You</h1>
           <p className="mt-1 text-sm text-neutral-400">Use the map or search to discover verified women tailors</p>
         </div>
       </div>
 
       <div className="mx-auto max-w-7xl px-4 py-6">
-      <div className="mb-5 grid gap-4 rounded-2xl border border-neutral-100 bg-white p-4 shadow-sm lg:grid-cols-[1.1fr_0.9fr_0.7fr_0.7fr_0.6fr_auto_auto]">
+      <div className="mb-5 grid gap-4 rounded-2xl border border-neutral-100 bg-white p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-[1.1fr_0.9fr_0.7fr_0.7fr_0.6fr_auto_auto]">
         <Field label="Search">
           <input className={inputClass} placeholder="name, shop, area..." value={filters.search} onChange={(e) => update("search", e.target.value)} />
         </Field>
@@ -169,24 +170,26 @@ export function TailorMap({ setPage, setSelectedTailor }) {
         <Field label="Radius km">
           <input type="number" min="1" className={inputClass} value={filters.radiusKm} onChange={(e) => update("radiusKm", e.target.value)} />
         </Field>
-        <Button onClick={() => load()} className="self-end" disabled={loading}>
+        <Button onClick={() => load()} className="w-full self-end lg:w-auto" disabled={loading}>
           <Search size={18} />
           {loading ? "Searching" : "Search"}
         </Button>
-        <Button type="button" variant="secondary" onClick={useMyLocation} className="self-end" disabled={loading}>
+        <Button type="button" variant="secondary" onClick={useMyLocation} className="w-full self-end lg:w-auto" disabled={loading}>
           <LocateFixed size={18} />
           Near me
         </Button>
       </div>
-      <div className="mb-4 flex flex-col justify-between gap-2 rounded-2xl border border-neutral-100 bg-white px-4 py-3 text-sm font-semibold text-neutral-600 shadow-sm sm:flex-row sm:items-center">
-        <span className="flex items-center gap-2">
+      <div className="mb-4 flex flex-col justify-between gap-3 rounded-2xl border border-neutral-100 bg-white px-4 py-3 text-sm font-semibold text-neutral-600 shadow-sm sm:flex-row sm:items-center">
+        <span className="flex min-w-0 items-start gap-2 sm:items-center">
           <MapPin size={16} />
-          {location
-            ? `Searching within ${filters.radiusKm || 20} km of pinned location (${Number(location.lat).toFixed(4)}, ${Number(location.lng).toFixed(4)})`
-            : "Click the map or use Near me to search nearby tailors."}
+          <span className="min-w-0 break-words">
+            {location
+              ? `Searching within ${filters.radiusKm || 20} km of pinned location (${Number(location.lat).toFixed(4)}, ${Number(location.lng).toFixed(4)})`
+              : `Showing ${DEFAULT_LOCATION.label}. Click the map or use Near me to search nearby tailors.`}
+          </span>
         </span>
         {location && (
-          <Button type="button" variant="secondary" onClick={() => load(location)} disabled={loading}>
+          <Button type="button" variant="secondary" onClick={() => load(location)} className="w-full sm:w-auto" disabled={loading}>
             Search from pin
           </Button>
         )}
@@ -215,7 +218,7 @@ export function TailorMap({ setPage, setSelectedTailor }) {
             ))}
           </MapContainer>
         </div>
-        <aside className="space-y-3">
+        <aside className="space-y-3 lg:max-h-[calc(100vh-220px)] lg:overflow-y-auto lg:pr-1">
           {!loading && tailors.length === 0 && (
             <div className="rounded-2xl border border-dashed border-neutral-200 bg-white p-6 text-center shadow-sm">
               <p className="font-bold text-neutral-950">No tailors found</p>
@@ -225,8 +228,8 @@ export function TailorMap({ setPage, setSelectedTailor }) {
           {tailors.map((tailor) => (
             <article key={tailor.id} className="rounded-2xl border border-neutral-100 bg-white p-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
               <div className="flex gap-3">
-                <img src={tailor.profilePhotoUrl || "https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?auto=format&fit=crop&w=160&q=80"} className="h-16 w-16 rounded-lg object-cover" alt={tailor.name} />
-                <div>
+                <img src={tailor.profilePhotoUrl || "https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?auto=format&fit=crop&w=160&q=80"} className="h-16 w-16 flex-shrink-0 rounded-lg object-cover" alt={tailor.name} />
+                <div className="min-w-0">
                   <h3 className="font-bold">{tailor.name}</h3>
                   <p className="text-sm font-semibold text-neutral-700">{tailor.shopName || "Home tailor"} - {tailor.shopType || "Home-based"}</p>
               <span className={`mt-1 inline-flex rounded-full px-2.5 py-0.5 text-xs font-bold ${
@@ -243,8 +246,8 @@ export function TailorMap({ setPage, setSelectedTailor }) {
                 <div className="mt-3 grid gap-1 rounded-xl bg-neutral-50 border border-neutral-100 p-3 text-sm">
                   {(tailor.serviceFees || []).slice(0, 3).map((item, index) => (
                     <div key={`${item.service}-${index}`} className="flex justify-between gap-3">
-                      <span>{item.service}</span>
-                      <span className="font-bold text-rosewood">{item.fee}</span>
+                      <span className="min-w-0 break-words">{item.service}</span>
+                      <span className="flex-shrink-0 font-bold text-rosewood">{item.fee}</span>
                     </div>
                   ))}
                 </div>

@@ -25,15 +25,15 @@ export function Shell({ currentPage, setPage, openAuth, children }) {
           ? "border-b border-neutral-800 bg-neutral-950 backdrop-blur-lg"
           : "border-b border-pink-100 bg-white/95 backdrop-blur"}`}
       >
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:py-3.5">
 
           {/* Logo */}
-          <button onClick={() => setPage("landing")} className="flex items-center gap-2.5 group">
+          <button onClick={() => setPage("landing")} className="group flex min-w-0 items-center gap-2.5">
             <span className={`grid h-9 w-9 place-items-center rounded-lg transition-colors
               ${isLanding ? "bg-rosewood/30 text-pink-400" : "bg-pink-100 text-rosewood"}`}>
               <Scissors size={18} />
             </span>
-            <span className={`text-xl font-extrabold ${isLanding ? "text-white" : "text-neutral-950"}`}>
+            <span className={`truncate text-lg font-extrabold sm:text-xl ${isLanding ? "text-white" : "text-neutral-950"}`}>
               Silrahi
             </span>
           </button>
@@ -53,10 +53,10 @@ export function Shell({ currentPage, setPage, openAuth, children }) {
           </nav>
 
           {/* Right */}
-          <div className="flex items-center gap-2">
+          <div className="flex min-w-0 items-center gap-2">
             {/* Language Toggle */}
             <button onClick={toggle}
-              className={`flex items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-bold transition-colors
+              className={`hidden items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-bold transition-colors min-[380px]:flex
                 ${isLanding
                   ? "border-neutral-700 bg-neutral-800 text-neutral-300 hover:bg-neutral-700 hover:text-white"
                   : "border-pink-200 bg-pink-50 text-rosewood hover:bg-pink-100"}`}
@@ -114,6 +114,15 @@ export function Shell({ currentPage, setPage, openAuth, children }) {
           <div className={`md:hidden border-t px-4 py-4 flex flex-col gap-2
             ${isLanding ? "border-neutral-800 bg-neutral-950" : "border-pink-100 bg-white"}`}
           >
+            <button onClick={toggle}
+              className={`flex items-center justify-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-bold transition-colors min-[380px]:hidden
+                ${isLanding
+                  ? "border-neutral-700 bg-neutral-800 text-neutral-300 hover:bg-neutral-700 hover:text-white"
+                  : "border-pink-200 bg-pink-50 text-rosewood hover:bg-pink-100"}`}
+            >
+              <Languages size={13} />
+              <span>{lang === "en" ? "à¤¹à¤¿à¤‚à¤¦à¥€" : "EN"}</span>
+            </button>
             {links.map(([key, label]) => (
               <button key={key}
                 onClick={() => { setPage(key); setMobileOpen(false); }}
@@ -125,7 +134,7 @@ export function Shell({ currentPage, setPage, openAuth, children }) {
                 {label}
               </button>
             ))}
-            <div className={`flex gap-2 pt-2 mt-1 border-t ${isLanding ? "border-neutral-800" : "border-pink-100"}`}>
+            <div className={`grid gap-2 pt-2 mt-1 border-t sm:flex ${isLanding ? "border-neutral-800" : "border-pink-100"}`}>
               {user ? (
                 <button onClick={() => { logout(); setMobileOpen(false); }}
                   className="flex-1 rounded-lg border border-pink-200 bg-white text-rosewood py-2.5 text-sm font-semibold"

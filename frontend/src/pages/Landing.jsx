@@ -59,9 +59,9 @@ function useFadeIn() {
 function StatCard({ value, suffix, label, icon: Icon }) {
   const [count, ref] = useCountUp(value);
   return (
-    <div ref={ref} className="flex flex-col items-center gap-2 p-6 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
+    <div ref={ref} className="flex flex-col items-center gap-2 rounded-2xl border border-white/20 bg-white/10 p-4 backdrop-blur-sm sm:p-6">
       {Icon && <Icon size={22} className="text-pink-200 mb-1" />}
-      <span className="text-4xl font-extrabold text-white tabular-nums">{count.toLocaleString()}{suffix}</span>
+      <span className="text-2xl font-extrabold text-white tabular-nums sm:text-4xl">{count.toLocaleString()}{suffix}</span>
       <span className="text-sm text-pink-200 font-medium text-center">{label}</span>
     </div>
   );
@@ -79,7 +79,7 @@ function FeatureCard({ icon: Icon, title, text, accent = "pink", delay = 0 }) {
     <article
       ref={ref}
       style={{ transitionDelay: `${delay}ms` }}
-      className={`group rounded-2xl border border-neutral-100 bg-white p-7 shadow-sm hover:shadow-md
+      className={`group rounded-2xl border border-neutral-100 bg-white p-5 shadow-sm hover:shadow-md sm:p-7
         hover:-translate-y-1 transition-all duration-500
         ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
     >
@@ -99,7 +99,7 @@ function TestimonialCard({ name, role, quote, avatar, delay = 0 }) {
     <div
       ref={ref}
       style={{ transitionDelay: `${delay}ms` }}
-      className={`rounded-2xl bg-white border border-neutral-100 p-6 shadow-sm hover:shadow-md
+      className={`rounded-2xl bg-white border border-neutral-100 p-5 shadow-sm hover:shadow-md sm:p-6
         hover:-translate-y-1 transition-all duration-500
         ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
     >
@@ -134,8 +134,8 @@ function Step({ n, title, text, delay = 0 }) {
         {n}
       </div>
       <div className="pt-1">
-        <h4 className="font-bold text-neutral-900 text-sm">{title}</h4>
-        <p className="text-sm text-neutral-500 mt-1 leading-relaxed">{text}</p>
+        <h4 className="font-bold text-white text-sm">{title}</h4>
+        <p className="text-sm text-neutral-300 mt-1 leading-relaxed">{text}</p>
       </div>
     </div>
   );
@@ -149,7 +149,7 @@ function ServicePill({ emoji, name, delay, onClick }) {
       ref={ref}
       onClick={onClick}
       style={{ transitionDelay: `${delay}ms` }}
-      className={`group flex flex-col items-center gap-3 rounded-2xl border border-neutral-100 bg-white p-5 shadow-sm
+      className={`group flex min-h-32 flex-col items-center justify-center gap-3 rounded-2xl border border-neutral-100 bg-white p-4 shadow-sm sm:p-5
         hover:border-rosewood hover:shadow-lg hover:-translate-y-1.5 transition-all duration-300
         ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
     >
@@ -279,7 +279,7 @@ export function Landing({ setPage, openAuth }) {
     <main className="overflow-x-hidden bg-[#fafafa]">
 
       {/* ── HERO ── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-neutral-950 via-[#1a0a1f] to-[#0f0a1e] flex items-center">
+      <section className="relative flex min-h-[calc(100svh-60px)] items-center overflow-hidden bg-gradient-to-br from-neutral-950 via-[#1a0a1f] to-[#0f0a1e]">
         {/* decorative blobs */}
         <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 h-[600px] w-[700px] rounded-full bg-rosewood/20 blur-[120px]" />
         <div className="pointer-events-none absolute bottom-0 right-0 h-80 w-80 rounded-full bg-amethyst/15 blur-[80px]" />
@@ -287,17 +287,17 @@ export function Landing({ setPage, openAuth }) {
 
         <div
           ref={heroRef}
-          className={`relative mx-auto grid max-w-7xl gap-12 px-4 py-12 w-full
+          className={`relative mx-auto grid w-full max-w-7xl gap-10 px-4 py-10
             md:grid-cols-[1.2fr_0.8fr] md:py-16 transition-all duration-1000
             ${heroVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}`}
         >
           {/* left */}
           <div className="flex flex-col justify-center">
-            <span className="mb-6 inline-flex w-fit items-center gap-2 rounded-full border border-pink-500/30 bg-pink-500/10 px-4 py-2 text-xs font-bold text-pink-300 uppercase tracking-widest">
+            <span className="mb-5 inline-flex w-fit items-center gap-2 rounded-full border border-pink-500/30 bg-pink-500/10 px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-pink-300 sm:px-4 sm:text-xs">
               <Sparkles size={11} className="animate-spin-slow" /> {t.badge}
             </span>
 
-            <h1 className="text-5xl font-extrabold leading-[1.1] tracking-tight text-white md:text-7xl">
+            <h1 className="text-4xl font-extrabold leading-[1.12] tracking-tight text-white sm:text-5xl md:text-7xl">
               {t.heroTitle1}{" "}
               <span className="bg-gradient-to-r from-pink-400 via-rose-400 to-purple-400 bg-clip-text text-transparent">
                 {t.heroTitle2}
@@ -305,30 +305,30 @@ export function Landing({ setPage, openAuth }) {
               <br />{t.heroTitle3}
             </h1>
 
-            <p className="mt-6 max-w-lg text-lg leading-8 text-neutral-300">{t.heroDesc}</p>
+            <p className="mt-5 max-w-lg text-base leading-7 text-neutral-300 sm:mt-6 sm:text-lg sm:leading-8">{t.heroDesc}</p>
 
-            <div className="mt-10 flex flex-wrap gap-3">
+            <div className="mt-8 grid gap-3 sm:mt-10 sm:flex sm:flex-wrap">
               <button
                 onClick={() => setPage("map")}
-                className="flex items-center gap-2.5 rounded-xl bg-gradient-to-r from-rosewood to-pink-600 text-white font-bold px-7 py-3.5 hover:opacity-90 hover:scale-105 transition-all shadow-xl shadow-pink-900/40 text-sm"
+                className="flex items-center justify-center gap-2.5 rounded-xl bg-gradient-to-r from-rosewood to-pink-600 px-6 py-3.5 text-sm font-bold text-white shadow-xl shadow-pink-900/40 transition-all hover:opacity-90 hover:scale-105 sm:px-7"
               >
                 <MapPin size={16} /> {t.findTailorBtn}
               </button>
               <button
                 onClick={() => openAuth("customer")}
-                className="flex items-center gap-2.5 rounded-xl border border-white/20 bg-white/8 text-white font-bold px-7 py-3.5 hover:bg-white/15 hover:scale-105 transition-all backdrop-blur-sm text-sm"
+                className="flex items-center justify-center gap-2.5 rounded-xl border border-white/20 bg-white/8 px-6 py-3.5 text-sm font-bold text-white backdrop-blur-sm transition-all hover:bg-white/15 hover:scale-105 sm:px-7"
               >
                 {t.customerLogin}
               </button>
               <button
                 onClick={() => openAuth("tailor")}
-                className="flex items-center gap-2.5 rounded-xl border border-white/20 bg-white/8 text-white font-bold px-7 py-3.5 hover:bg-white/15 hover:scale-105 transition-all backdrop-blur-sm text-sm"
+                className="flex items-center justify-center gap-2.5 rounded-xl border border-white/20 bg-white/8 px-6 py-3.5 text-sm font-bold text-white backdrop-blur-sm transition-all hover:bg-white/15 hover:scale-105 sm:px-7"
               >
                 <Scissors size={15} /> {t.tailorLogin}
               </button>
             </div>
 
-            <div className="mt-8 flex flex-wrap gap-5">
+            <div className="mt-7 grid gap-3 sm:flex sm:flex-wrap sm:gap-5">
               {[t.trust1, t.trust2, t.trust3].map((b) => (
                 <span key={b} className="inline-flex items-center gap-1.5 text-sm text-neutral-400">
                   <CheckCircle2 size={14} className="text-pink-400" /> {b}
@@ -401,10 +401,10 @@ export function Landing({ setPage, openAuth }) {
       </section>
 
       {/* ── SERVICES ── */}
-      <section className="mx-auto max-w-7xl px-4 py-20">
+      <section className="mx-auto max-w-7xl px-4 py-14 sm:py-20">
         <div className="text-center mb-12">
           <SectionLabel text="Services" />
-          <h2 className="mt-4 text-4xl font-extrabold text-neutral-900 tracking-tight">{t.servicesTitle}</h2>
+          <h2 className="mt-4 text-3xl font-extrabold tracking-tight text-neutral-900 sm:text-4xl">{t.servicesTitle}</h2>
           <p className="mt-3 text-neutral-500 max-w-md mx-auto">{t.servicesSubtitle}</p>
         </div>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-6">
@@ -415,7 +415,7 @@ export function Landing({ setPage, openAuth }) {
       </section>
 
       {/* ── HOW IT WORKS ── */}
-      <section className="bg-neutral-950 py-20 relative overflow-hidden">
+      <section className="relative overflow-hidden bg-neutral-950 py-14 sm:py-20">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(190,24,93,0.15),transparent_60%)]" />
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(124,58,237,0.12),transparent_60%)]" />
         <div className="relative mx-auto max-w-5xl px-4">
@@ -423,17 +423,17 @@ export function Landing({ setPage, openAuth }) {
             <span className="inline-flex items-center gap-1.5 rounded-full border border-pink-500/30 bg-pink-500/10 px-4 py-1.5 text-xs font-bold text-pink-300 uppercase tracking-widest">
               <Zap size={11} /> Process
             </span>
-            <h2 className="mt-4 text-4xl font-extrabold text-white tracking-tight">{t.howTitle}</h2>
+            <h2 className="mt-4 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">{t.howTitle}</h2>
           </div>
 
           {/* tab switcher */}
           <div className="flex justify-center mb-12">
-            <div className="inline-flex rounded-xl bg-white/8 p-1 border border-white/10">
+            <div className="grid w-full grid-cols-2 rounded-xl border border-white/10 bg-white/8 p-1 sm:inline-grid sm:w-auto">
               {[["customer", t.tabCustomer], ["tailor", t.tabTailor]].map(([key, label]) => (
                 <button
                   key={key}
                   onClick={() => setActiveTab(key)}
-                  className={`px-7 py-2.5 rounded-lg text-sm font-semibold transition-all
+                  className={`rounded-lg px-4 py-2.5 text-sm font-semibold transition-all sm:px-7
                     ${activeTab === key
                       ? "bg-gradient-to-r from-rosewood to-pink-600 text-white shadow-lg"
                       : "text-neutral-400 hover:text-white"}`}
@@ -451,7 +451,7 @@ export function Landing({ setPage, openAuth }) {
               ))}
             </div>
 
-            <div className="rounded-2xl bg-white/5 border border-white/10 p-7 backdrop-blur-sm">
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm sm:p-7">
               <div className="flex items-center gap-3 mb-6">
                 <div className="h-10 w-10 rounded-full bg-gradient-to-br from-rosewood to-amethyst flex items-center justify-center shadow-lg">
                   {activeTab === "customer"
@@ -486,10 +486,10 @@ export function Landing({ setPage, openAuth }) {
       </section>
 
       {/* ── FEATURES ── */}
-      <section className="mx-auto max-w-7xl px-4 py-20">
+      <section className="mx-auto max-w-7xl px-4 py-14 sm:py-20">
         <div className="text-center mb-12">
           <SectionLabel text="Features" />
-          <h2 className="mt-4 text-4xl font-extrabold text-neutral-900 tracking-tight">{t.featuresTitle}</h2>
+          <h2 className="mt-4 text-3xl font-extrabold tracking-tight text-neutral-900 sm:text-4xl">{t.featuresTitle}</h2>
           <p className="mt-3 text-neutral-500 max-w-md mx-auto">Everything you need, built into one platform.</p>
         </div>
         <div className="grid gap-5 md:grid-cols-3">
@@ -503,11 +503,11 @@ export function Landing({ setPage, openAuth }) {
       </section>
 
       {/* ── TESTIMONIALS ── */}
-      <section className="bg-neutral-50 border-y border-neutral-100 py-20">
+      <section className="border-y border-neutral-100 bg-neutral-50 py-14 sm:py-20">
         <div className="mx-auto max-w-7xl px-4">
           <div className="text-center mb-12">
             <SectionLabel text="Testimonials" />
-            <h2 className="mt-4 text-4xl font-extrabold text-neutral-900 tracking-tight">{t.testimonialsTitle}</h2>
+            <h2 className="mt-4 text-3xl font-extrabold tracking-tight text-neutral-900 sm:text-4xl">{t.testimonialsTitle}</h2>
           </div>
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
             {[
@@ -523,22 +523,22 @@ export function Landing({ setPage, openAuth }) {
       </section>
 
       {/* ── CTA BANNER ── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-neutral-950 via-[#1a0a1f] to-amethyst py-24">
+      <section className="relative overflow-hidden bg-gradient-to-br from-neutral-950 via-[#1a0a1f] to-amethyst py-16 sm:py-24">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(190,24,93,0.25),transparent_65%)]" />
         <div className="relative mx-auto max-w-3xl px-4 text-center">
           <Scissors size={40} className="mx-auto mb-5 text-pink-400 opacity-80" />
-          <h2 className="text-4xl font-extrabold text-white md:text-5xl leading-tight">{t.ctaTitle}</h2>
+          <h2 className="text-3xl font-extrabold leading-tight text-white sm:text-4xl md:text-5xl">{t.ctaTitle}</h2>
           <p className="mt-4 text-lg text-neutral-300 max-w-xl mx-auto">{t.ctaDesc}</p>
-          <div className="mt-10 flex flex-wrap justify-center gap-4">
+          <div className="mt-8 grid gap-3 sm:mt-10 sm:flex sm:flex-wrap sm:justify-center sm:gap-4">
             <button
               onClick={() => setPage("map")}
-              className="flex items-center gap-2 rounded-xl bg-white text-rosewood font-bold px-9 py-3.5 hover:bg-pink-50 hover:scale-105 transition-all shadow-2xl text-sm"
+              className="flex items-center justify-center gap-2 rounded-xl bg-white px-7 py-3.5 text-sm font-bold text-rosewood shadow-2xl transition-all hover:bg-pink-50 hover:scale-105 sm:px-9"
             >
               <MapPin size={16} /> {t.ctaCustomer}
             </button>
             <button
               onClick={() => openAuth("tailor")}
-              className="flex items-center gap-2 rounded-xl border border-white/25 bg-white/10 text-white font-bold px-9 py-3.5 hover:bg-white/18 hover:scale-105 transition-all backdrop-blur-sm text-sm"
+              className="flex items-center justify-center gap-2 rounded-xl border border-white/25 bg-white/10 px-7 py-3.5 text-sm font-bold text-white backdrop-blur-sm transition-all hover:bg-white/18 hover:scale-105 sm:px-9"
             >
               <Scissors size={16} /> {t.ctaTailor}
             </button>
