@@ -42,26 +42,26 @@ export function AdminPanel() {
   return (
     <main className="min-h-screen bg-[#fafafa]">
       {/* header */}
-      <div className="bg-gradient-to-r from-neutral-950 via-[#1a0a1f] to-amethyst px-4 py-10 relative overflow-hidden">
+      <div className="relative overflow-hidden bg-gradient-to-r from-neutral-950 via-[#1a0a1f] to-amethyst px-4 py-8 sm:py-10">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(190,24,93,0.2),transparent_60%)]" />
         <div className="relative mx-auto max-w-7xl">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-xs font-bold text-pink-400 uppercase tracking-widest mb-1">Silrahi</p>
-              <h1 className="text-3xl font-extrabold text-white">Admin Panel</h1>
+              <h1 className="text-2xl font-extrabold text-white sm:text-3xl">Admin Panel</h1>
               <p className="mt-1 text-neutral-400 text-sm">Manage tailors, users and bookings</p>
             </div>
             <button onClick={load} disabled={loading}
-              className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/8 px-4 py-2.5 text-sm font-semibold text-white hover:bg-white/15 transition-colors">
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/8 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-white/15 sm:w-auto">
               <RefreshCw size={14} className={loading ? "animate-spin" : ""} /> Refresh
             </button>
           </div>
 
           {/* stat pills */}
-          <div className="mt-6 flex flex-wrap gap-3">
+          <div className="mt-6 grid gap-3 min-[460px]:grid-cols-3 sm:flex sm:flex-wrap">
             {tabs.map(([key, label, Icon, count]) => (
               <button key={key} onClick={() => setTab(key)}
-                className={`flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold transition-all
+                className={`flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold transition-all
                   ${tab === key
                     ? "bg-white text-rosewood shadow-lg"
                     : "border border-white/15 bg-white/8 text-white hover:bg-white/15"}`}>

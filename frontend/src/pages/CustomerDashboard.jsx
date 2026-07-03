@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Button } from "../components/Button";
 import { Field, inputClass } from "../components/Field";
 import { LocationPicker } from "../components/LocationPicker";
+import { DEFAULT_LOCATION } from "../constants/location";
 import { useAuth } from "../context/AuthContext";
 import { api } from "../services/api";
 
@@ -27,7 +28,7 @@ export function CustomerDashboard({ setPage }) {
     name: user?.name || "",
     phone: user?.phone || "",
     address: "",
-    location: { lat: 28.6139, lng: 77.209 }
+    location: { lat: DEFAULT_LOCATION.lat, lng: DEFAULT_LOCATION.lng }
   });
   const [recommendedTailors, setRecommendedTailors] = useState([]);
   const [savedTailors, setSavedTailors] = useState([]);
@@ -95,8 +96,8 @@ export function CustomerDashboard({ setPage }) {
         phone: profile.phone,
         address: profile.address || "",
         location: {
-          lat: Number(profile.location?.lat || 28.6139),
-          lng: Number(profile.location?.lng || 77.209)
+          lat: Number(profile.location?.lat || DEFAULT_LOCATION.lat),
+          lng: Number(profile.location?.lng || DEFAULT_LOCATION.lng)
         }
       });
       setMessage("Profile saved.");
@@ -192,16 +193,16 @@ export function CustomerDashboard({ setPage }) {
   return (
     <main className="min-h-screen bg-[#fafafa]">
       {/* dark header */}
-      <div className="bg-gradient-to-r from-neutral-950 via-[#1a0a1f] to-[#0f0a1e] px-4 py-10 relative overflow-hidden">
+      <div className="relative overflow-hidden bg-gradient-to-r from-neutral-950 via-[#1a0a1f] to-[#0f0a1e] px-4 py-8 sm:py-10">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(190,24,93,0.15),transparent_60%)]" />
         <div className="relative mx-auto max-w-7xl flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-xs font-bold text-pink-400 uppercase tracking-widest mb-1">Customer Dashboard</p>
-            <h1 className="text-3xl font-extrabold text-white">Welcome, {user.name}</h1>
+            <h1 className="break-words text-2xl font-extrabold text-white sm:text-3xl">Welcome, {user.name}</h1>
             <p className="mt-1 text-neutral-400 text-sm">Manage bookings, profile, and nearby stitching services.</p>
           </div>
           <button onClick={() => setPage("map")}
-            className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-rosewood to-pink-600 text-white font-bold px-6 py-3 text-sm hover:opacity-90 transition-opacity shadow-lg w-fit">
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-rosewood to-pink-600 px-6 py-3 text-sm font-bold text-white shadow-lg transition-opacity hover:opacity-90 sm:w-fit">
             <Search size={16} /> Search Tailors
           </button>
         </div>
@@ -212,25 +213,25 @@ export function CustomerDashboard({ setPage }) {
       {error && <p className="mb-4 rounded-xl bg-red-50 border border-red-200 p-3 font-semibold text-red-700">{error}</p>}
       {message && <p className="mb-4 rounded-xl bg-emerald-50 border border-emerald-200 p-3 font-semibold text-emerald-700">{message}</p>}
 
-      <section className="mb-6 grid gap-4 md:grid-cols-4">
+      <section className="mb-6 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
         {[
           ["Total bookings", computedStats.totalBookings, CalendarCheck, "bg-pink-50 text-rosewood border-pink-100"],
           ["Active", computedStats.activeBookings, Clock3, "bg-blue-50 text-blue-700 border-blue-100"],
           ["Delivered", computedStats.deliveredBookings, CheckCircle2, "bg-emerald-50 text-emerald-700 border-emerald-100"],
           ["Cancelled", computedStats.cancelledBookings, XCircle, "bg-neutral-100 text-neutral-700 border-neutral-200"]
         ].map(([label, value, Icon, color]) => (
-          <article key={label} className="rounded-2xl border border-neutral-100 bg-white p-5 shadow-sm hover:shadow-md transition-shadow">
-            <div className={`mb-3 grid h-11 w-11 place-items-center rounded-xl border ${color}`}>
+          <article key={label} className="rounded-2xl border border-neutral-100 bg-white p-4 shadow-sm transition-shadow hover:shadow-md sm:p-5">
+            <div className={`mb-3 grid h-10 w-10 place-items-center rounded-xl border sm:h-11 sm:w-11 ${color}`}>
               <Icon size={18} />
             </div>
             <p className="text-sm font-semibold text-neutral-500">{label}</p>
-            <p className="text-3xl font-extrabold text-neutral-950">{loading ? "--" : value}</p>
+            <p className="text-2xl font-extrabold text-neutral-950 sm:text-3xl">{loading ? "--" : value}</p>
           </article>
         ))}
       </section>
 
       <div className="grid gap-6 lg:grid-cols-[0.9fr_1.4fr]">
-        <section className="rounded-2xl border border-neutral-100 bg-white p-6 shadow-sm">
+        <section className="rounded-2xl border border-neutral-100 bg-white p-4 shadow-sm sm:p-6">
           <h2 className="text-xl font-extrabold text-neutral-950">Profile</h2>
           <form onSubmit={saveProfile} className="mt-4 grid gap-4">
             <Field label="Name">
@@ -280,13 +281,13 @@ export function CustomerDashboard({ setPage }) {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-neutral-100 bg-white p-6 shadow-sm">
+        <section className="rounded-2xl border border-neutral-100 bg-white p-4 shadow-sm sm:p-6">
           <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
             <div>
               <h2 className="text-xl font-extrabold text-neutral-950">Your bookings</h2>
               <p className="text-sm text-neutral-600">{activeBookings.length} active order(s)</p>
             </div>
-            <Button variant="secondary" onClick={load} disabled={loading}>{loading ? "Loading..." : "Refresh"}</Button>
+            <Button variant="secondary" onClick={load} className="w-full sm:w-auto" disabled={loading}>{loading ? "Loading..." : "Refresh"}</Button>
           </div>
           <div className="mt-4 grid gap-3">
             {!loading && bookings.length === 0 && (
@@ -326,17 +327,17 @@ export function CustomerDashboard({ setPage }) {
                       </div>
                     )}
                   </div>
-                  <div className="flex flex-col items-start gap-2 md:items-end">
+                  <div className="flex flex-col items-stretch gap-2 md:items-end">
                     <span className={`rounded-full border px-3 py-1 text-sm font-bold capitalize ${statusStyles[booking.status] || statusStyles.pending}`}>
                       {statusLabel(booking.status)}
                     </span>
                     {booking.status === "pending" && (
-                      <Button type="button" variant="secondary" onClick={() => cancelBooking(booking.id)}>
+                      <Button type="button" variant="secondary" className="w-full md:w-auto" onClick={() => cancelBooking(booking.id)}>
                         Cancel
                       </Button>
                     )}
                     {booking.paymentStatus !== "paid" && ["ready", "delivered"].includes(booking.status) && (
-                      <Button type="button" onClick={() => payBooking(booking)}>
+                      <Button type="button" className="w-full md:w-auto" onClick={() => payBooking(booking)}>
                         <IndianRupee size={16} />
                         Pay Tailor
                       </Button>
@@ -347,7 +348,7 @@ export function CustomerDashboard({ setPage }) {
                 {!["cancelled", "rejected"].includes(booking.status) && (
                   <div className="mt-4 grid gap-2 rounded-lg bg-white sm:grid-cols-[1fr_auto]">
                     <input className={inputClass} placeholder="Message tailor" value={messageDrafts[booking.id] || ""} onChange={(e) => updateMessageDraft(booking.id, e.target.value)} />
-                    <Button type="button" variant="secondary" onClick={() => sendBookingMessage(booking)}>Send</Button>
+                    <Button type="button" variant="secondary" className="w-full sm:w-auto" onClick={() => sendBookingMessage(booking)}>Send</Button>
                   </div>
                 )}
                 {booking.status === "delivered" && (
@@ -356,7 +357,7 @@ export function CustomerDashboard({ setPage }) {
                       {[5, 4, 3, 2, 1].map((rating) => <option key={rating} value={rating}>{rating} stars</option>)}
                     </select>
                     <input className={inputClass} placeholder="Write review" value={reviews[booking.id]?.comment || ""} onChange={(e) => updateReview(booking.id, "comment", e.target.value)} />
-                    <Button type="button" onClick={() => submitReview(booking)}>Review</Button>
+                    <Button type="button" className="w-full sm:w-auto" onClick={() => submitReview(booking)}>Review</Button>
                   </div>
                 )}
               </article>

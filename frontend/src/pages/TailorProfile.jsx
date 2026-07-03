@@ -75,25 +75,25 @@ export function TailorProfile({ tailor, setPage }) {
   return (
     <main className="min-h-screen bg-[#fafafa]">
       {/* dark header */}
-      <div className="bg-gradient-to-r from-neutral-950 via-[#1a0a1f] to-[#0f0a1e] px-4 py-8 relative overflow-hidden">
+      <div className="relative overflow-hidden bg-gradient-to-r from-neutral-950 via-[#1a0a1f] to-[#0f0a1e] px-4 py-7 sm:py-8">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(190,24,93,0.15),transparent_60%)]" />
-        <div className="relative mx-auto max-w-6xl flex items-center gap-4">
-          <button onClick={() => setPage("map")} className="flex items-center gap-2 rounded-xl border border-neutral-700 bg-neutral-800 px-4 py-2 text-sm font-semibold text-white hover:bg-neutral-700 transition-colors">
+        <div className="relative mx-auto flex max-w-6xl flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+          <button onClick={() => setPage("map")} className="flex w-fit items-center gap-2 rounded-xl border border-neutral-700 bg-neutral-800 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-neutral-700">
             ← Back
           </button>
-          <div>
-            <h1 className="text-xl font-extrabold text-white">{tailor.name}</h1>
+          <div className="min-w-0">
+            <h1 className="break-words text-xl font-extrabold text-white">{tailor.name}</h1>
             <p className="text-sm text-neutral-400">{tailor.shopName || "Home tailor"} · {tailor.shopType || "Home-based"}</p>
           </div>
         </div>
       </div>
 
-      <div className="mx-auto grid max-w-6xl gap-6 px-4 py-8 md:grid-cols-[0.9fr_1.1fr]">
-      <section className="rounded-2xl border border-neutral-100 bg-white p-6 shadow-sm">
-        <img src={tailor.profilePhotoUrl || "https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?auto=format&fit=crop&w=900&q=80"} className="mb-5 h-64 w-full rounded-lg object-cover" alt={tailor.name} />
+      <div className="mx-auto grid max-w-6xl gap-6 px-4 py-6 sm:py-8 md:grid-cols-[0.9fr_1.1fr]">
+      <section className="rounded-2xl border border-neutral-100 bg-white p-4 shadow-sm sm:p-6">
+        <img src={tailor.profilePhotoUrl || "https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?auto=format&fit=crop&w=900&q=80"} className="mb-5 h-52 w-full rounded-lg object-cover sm:h-64" alt={tailor.name} />
         <div className="flex flex-col justify-between gap-3 sm:flex-row">
           <div>
-            <h1 className="text-3xl font-extrabold">{tailor.name}</h1>
+            <h1 className="break-words text-2xl font-extrabold sm:text-3xl">{tailor.name}</h1>
             <p className="mt-1 font-semibold text-rosewood">{tailor.shopName || "Home tailor"} - {tailor.shopType || "Home-based"}</p>
           </div>
           <span className="h-fit rounded-full bg-pink-50 px-3 py-1 text-sm font-bold capitalize text-rosewood">
@@ -146,7 +146,7 @@ export function TailorProfile({ tailor, setPage }) {
           </div>
         </div>
       </section>
-      <section className="rounded-2xl border border-neutral-100 bg-white p-6 shadow-sm">
+      <section className="rounded-2xl border border-neutral-100 bg-white p-4 shadow-sm sm:p-6">
         <h2 className="mb-1 text-2xl font-bold">Book stitching service</h2>
         <p className="mb-4 text-sm text-neutral-600">Add measurements, completion date, and a reference image. You will visit the tailor's listed address for stitching.</p>
         <form onSubmit={book} className="space-y-4">
@@ -176,7 +176,7 @@ export function TailorProfile({ tailor, setPage }) {
               <input type="date" className={`${inputClass} pl-10`} value={form.deliveryDate} onChange={(e) => update("deliveryDate", e.target.value)} required />
             </div>
           </Field>
-          <label className="flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-dashed border-pink-200 bg-pink-50 p-4">
+          <label className="flex cursor-pointer flex-col items-start justify-between gap-3 rounded-xl border border-dashed border-pink-200 bg-pink-50 p-4 sm:flex-row sm:items-center">
             <span className="inline-flex items-center gap-2 font-semibold text-rosewood"><ImagePlus size={18} /> {referenceImage ? referenceImage.name : "Upload cloth/design reference"}</span>
             <input type="file" accept="image/*" className="hidden" onChange={(event) => setReferenceImage(event.target.files?.[0] || null)} />
           </label>
