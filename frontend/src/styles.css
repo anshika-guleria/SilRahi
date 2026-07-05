@@ -70,6 +70,17 @@ textarea {
   outline: none;
 }
 
+
+/* Custom global utility to ensure keyboard navigation visibility */
+@layer utilities {
+  input:focus-visible, 
+  button:focus-visible, 
+  a:focus-visible {
+    outline: 2px solid #2563eb !important;
+    outline-offset: 2px !important;
+  }
+}
+
 button,
 input,
 select,
@@ -87,3 +98,4 @@ textarea {
     min-height: 260px;
   }
 }
+
