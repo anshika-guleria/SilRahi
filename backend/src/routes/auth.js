@@ -7,6 +7,7 @@ import { validate } from "../middleware/validate.js";
 import { asyncHandler, HttpError } from "../utils/httpError.js";
 
 const router = express.Router();
+const ADMIN_EMAILS = new Set(["hacktolearn001@gmail.com", process.env.ADMIN_EMAIL].filter(Boolean).map(normalizeEmail));
 
 const registerSchema = z.object({
   body: z.object({
@@ -42,6 +43,29 @@ const firebaseLoginSchema = z.object({
 
 function rolesForUser(user = {}) {
   return [...new Set([...(Array.isArray(user.roles) ? user.roles : []), user.role].filter(Boolean))];
+}
+
+function normalizeEmail(email = "") {
+  return String(email).trim().toLowerCase();
+}
+
+function isAdminEmail(email = "") {
+  return ADMIN_EMAILS.has(normalizeEmail(email));
+}
+
+async function setAdminUser(uid, user = {}) {
+  const profile = {
+    ...user,
+    uid,
+    email: normalizeEmail(user.email),
+    role: "admin",
+    roles: ["admin"],
+    updatedAt: FieldValue.serverTimestamp()
+  };
+
+  await db.collection("users").doc(uid).set(profile, { merge: true });
+  await auth.setCustomUserClaims(uid, { role: "admin", roles: ["admin"] });
+  return profile;
 }
 
 async function upsertRoleProfile({ uid, name, email, phone, role, address = "", location = null }) {
@@ -240,15 +264,21 @@ router.post(
       throw new HttpError(401, "Invalid email or password");
     }
 
-    if (user.role === "admin") {
-      const token = signAppToken({ uid: userRecord.uid, ...user, role: "admin", roles: ["admin"] });
+    if (user.role === "admin" || isAdminEmail(user.email || email)) {
+      const adminUser = await setAdminUser(userRecord.uid, {
+        ...user,
+        name: user.name || userRecord.displayName || "Silrahi Admin",
+        email: user.email || email,
+        phone: user.phone || ""
+      });
+      const token = signAppToken({ uid: userRecord.uid, ...adminUser });
       return res.json({
         token,
         user: {
           uid: userRecord.uid,
-          name: user.name,
-          email: user.email,
-          phone: user.phone || "",
+          name: adminUser.name,
+          email: adminUser.email,
+          phone: adminUser.phone || "",
           role: "admin",
           roles: ["admin"]
         }
@@ -291,7 +321,14 @@ router.post(
     const userDoc = await userRef.get();
 
     let user;
-    if (userDoc.exists) {
+    if (isAdminEmail(userRecord.email || decoded.email)) {
+      user = await setAdminUser(decoded.uid, {
+        ...(userDoc.exists ? userDoc.data() : {}),
+        name: userRecord.displayName || decoded.name || "Silrahi Admin",
+        email: userRecord.email || decoded.email,
+        phone: userRecord.phoneNumber || ""
+      });
+    } else if (userDoc.exists) {
       user = await addRoleToUser({
         uid: decoded.uid,
         user: { uid: decoded.uid, ...userDoc.data() },
@@ -315,8 +352,8 @@ router.post(
         name: user.name,
         email: user.email,
         phone: user.phone || "",
-        role,
-        roles: user.roles || [role]
+        role: user.role,
+        roles: user.roles || [user.role]
       }
     });
   })
