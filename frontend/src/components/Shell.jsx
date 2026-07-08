@@ -13,6 +13,7 @@ export function Shell({ currentPage, setPage, openAuth, children }) {
   const links = [
     ["landing", t.home],
     ["map", t.findTailors],
+    ["aiAdvisor", "Ask AI"],
     user?.role === "customer" && ["customer", t.customer],
     user?.role === "tailor"   && ["tailor",   t.tailor],
     user?.role === "admin"    && ["admin",     t.admin],

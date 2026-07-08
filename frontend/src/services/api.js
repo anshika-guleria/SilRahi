@@ -52,6 +52,7 @@ export const api = {
   reviews: (tailorId) => request(`/reviews/tailor/${tailorId}`),
   messages: (bookingId) => request(`/messages/${bookingId}`),
   sendMessage: (bookingId, text) => request(`/messages/${bookingId}`, { method: "POST", body: JSON.stringify({ text }) }),
+  styleAdvisor: (payload) => request("/ai/style-advisor", { method: "POST", body: JSON.stringify(payload) }),
   adminUsers: () => request("/admin/users"),
   adminTailors: () => request("/admin/tailors"),
   adminBookings: () => request("/admin/bookings"),

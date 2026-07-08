@@ -7,6 +7,7 @@ import morgan from "morgan";
 import bcrypt from "bcryptjs";
 import { auth, db, FieldValue } from "./config/firebase.js";
 import adminRoutes from "./routes/admin.js";
+import aiRoutes from "./routes/ai.js";
 import authRoutes from "./routes/auth.js";
 import bookingRoutes from "./routes/bookings.js";
 import customerRoutes from "./routes/customers.js";
@@ -32,7 +33,16 @@ const allowedOrigins = (process.env.FRONTEND_URL || "https://sil-rahi.vercel.app
   .concat(
     process.env.NODE_ENV === "production"
       ? []
-      : ["http://localhost:5174", "http://localhost:5175", "http://localhost:5176"]
+      : [
+          "http://localhost:5173",
+          "http://localhost:5174",
+          "http://localhost:5175",
+          "http://localhost:5176",
+          "http://127.0.0.1:5173",
+          "http://127.0.0.1:5174",
+          "http://127.0.0.1:5175",
+          "http://127.0.0.1:5176"
+        ]
   );
 
 app.use(
@@ -66,6 +76,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/ai", aiRoutes);
 app.use("/api/tailors", tailorRoutes);
 app.use("/api/customers", customerRoutes);
 app.use("/api/bookings", bookingRoutes);
@@ -110,7 +121,14 @@ async function ensureAdmin() {
 }
 
 async function startServer() {
-  await ensureAdmin();
+  try {
+    await ensureAdmin();
+  } catch (error) {
+    if (process.env.NODE_ENV === "production") {
+      throw error;
+    }
+    console.warn("Admin bootstrap skipped in local development:", error.message);
+  }
 
   if (process.env.VERCEL !== "1") {
     app.listen(port, () => {

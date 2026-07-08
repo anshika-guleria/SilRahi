@@ -3,7 +3,7 @@ import {
   HeartHandshake, MapPin, ShieldCheck, Sparkles, Star, ArrowRight,
   Scissors, TrendingUp, Users, ChevronDown, CheckCircle2, Zap,
   Globe, Award, MessageCircle, Phone, Mail, Instagram, Twitter,
-  Facebook, ChevronRight,
+  Facebook, ChevronRight, Wand2,
 } from "lucide-react";
 import { Button } from "../components/Button";
 import { useLang } from "../context/LanguageContext";
@@ -315,6 +315,12 @@ export function Landing({ setPage, openAuth }) {
                 <MapPin size={16} /> {t.findTailorBtn}
               </button>
               <button
+                onClick={() => setPage("aiAdvisor")}
+                className="flex items-center justify-center gap-2.5 rounded-xl border border-white/20 bg-white/8 px-6 py-3.5 text-sm font-bold text-white backdrop-blur-sm transition-all hover:bg-white/15 hover:scale-105 sm:px-7"
+              >
+                <Wand2 size={16} /> Ask SilRahi AI
+              </button>
+              <button
                 onClick={() => openAuth("customer")}
                 className="flex items-center justify-center gap-2.5 rounded-xl border border-white/20 bg-white/8 px-6 py-3.5 text-sm font-bold text-white backdrop-blur-sm transition-all hover:bg-white/15 hover:scale-105 sm:px-7"
               >
@@ -411,6 +417,35 @@ export function Landing({ setPage, openAuth }) {
           {services.map(({ emoji, name }, i) => (
             <ServicePill key={name} emoji={emoji} name={name} delay={i * 70} onClick={() => setPage("map")} />
           ))}
+        </div>
+      </section>
+
+      <section className="border-y border-pink-100 bg-white py-14 sm:py-16">
+        <div className="mx-auto grid max-w-7xl gap-6 px-4 md:grid-cols-[0.9fr_1.1fr] md:items-center">
+          <div>
+            <SectionLabel text="AI Style Advisor" />
+            <h2 className="mt-4 text-3xl font-extrabold tracking-tight text-neutral-900 sm:text-4xl">Ask SilRahi AI</h2>
+            <p className="mt-3 max-w-xl text-neutral-600">
+              Occasion, season, garment aur comfort ko samajh kar SilRahi fabric, color, design, price range aur tailor category suggest karta hai.
+            </p>
+            <button
+              onClick={() => setPage("aiAdvisor")}
+              className="mt-6 inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-rosewood to-pink-600 px-6 py-3 text-sm font-bold text-white shadow-lg transition-opacity hover:opacity-90"
+            >
+              <Wand2 size={16} /> Try AI Advisor
+            </button>
+          </div>
+          <div className="rounded-2xl border border-pink-100 bg-pink-50 p-4 sm:p-5">
+            <div className="rounded-xl bg-white p-4 shadow-sm">
+              <p className="text-sm font-bold text-neutral-950">Mujhe summer wedding ke liye lightweight lehenga chahiye</p>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                {["Chiffon", "Georgette", "Pastel pink", "Women ethnic wear specialist"].map((item) => (
+                  <span key={item} className="rounded-lg bg-pink-50 px-3 py-2 text-sm font-semibold text-rosewood">{item}</span>
+                ))}
+              </div>
+              <p className="mt-4 text-sm leading-6 text-neutral-600">Summer wedding ke liye lightweight fabric comfortable aur elegant rahega.</p>
+            </div>
+          </div>
         </div>
       </section>
 
