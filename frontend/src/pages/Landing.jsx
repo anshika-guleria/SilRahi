@@ -279,7 +279,7 @@ export function Landing({ setPage, openAuth }) {
     <main className="overflow-x-hidden bg-[#fafafa]">
 
       {/* ── HERO ── */}
-      <section className="relative flex min-h-[calc(100svh-60px)] items-center overflow-hidden bg-gradient-to-br from-neutral-950 via-[#1a0a1f] to-[#0f0a1e]">
+      <section className="relative flex min-h-[calc(100svh-96px)] items-center overflow-hidden bg-gradient-to-br from-neutral-950 via-[#1a0a1f] to-[#0f0a1e]">
         {/* decorative blobs */}
         <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 h-[600px] w-[700px] rounded-full bg-rosewood/20 blur-[120px]" />
         <div className="pointer-events-none absolute bottom-0 right-0 h-80 w-80 rounded-full bg-amethyst/15 blur-[80px]" />
@@ -287,17 +287,17 @@ export function Landing({ setPage, openAuth }) {
 
         <div
           ref={heroRef}
-          className={`relative mx-auto grid w-full max-w-7xl gap-10 px-4 py-10
-            md:grid-cols-[1.2fr_0.8fr] md:py-16 transition-all duration-1000
+          className={`relative mx-auto grid w-full max-w-7xl gap-6 px-4 py-6
+            md:grid-cols-[1.2fr_0.8fr] lg:py-8 transition-all duration-1000
             ${heroVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}`}
         >
           {/* left */}
           <div className="flex flex-col justify-center">
-            <span className="mb-5 inline-flex w-fit items-center gap-2 rounded-full border border-pink-500/30 bg-pink-500/10 px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-pink-300 sm:px-4 sm:text-xs">
+            <span className="mb-4 inline-flex w-fit items-center gap-2 rounded-full border border-pink-500/30 bg-pink-500/10 px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-pink-300 sm:px-4 sm:text-xs">
               <Sparkles size={11} className="animate-spin-slow" /> {t.badge}
             </span>
 
-            <h1 className="text-4xl font-extrabold leading-[1.12] tracking-tight text-white sm:text-5xl md:text-7xl">
+            <h1 className="text-4xl font-extrabold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-6xl">
               {t.heroTitle1}{" "}
               <span className="bg-gradient-to-r from-pink-400 via-rose-400 to-purple-400 bg-clip-text text-transparent">
                 {t.heroTitle2}
@@ -305,9 +305,9 @@ export function Landing({ setPage, openAuth }) {
               <br />{t.heroTitle3}
             </h1>
 
-            <p className="mt-5 max-w-lg text-base leading-7 text-neutral-300 sm:mt-6 sm:text-lg sm:leading-8">{t.heroDesc}</p>
+            <p className="mt-4 max-w-lg text-base leading-7 text-neutral-300 sm:text-lg sm:leading-8">{t.heroDesc}</p>
 
-            <div className="mt-8 grid gap-3 sm:mt-10 sm:flex sm:flex-wrap">
+            <div className="mt-6 grid gap-3 sm:mt-7 sm:flex sm:flex-wrap">
               <button
                 onClick={() => setPage("map")}
                 className="flex items-center justify-center gap-2.5 rounded-xl bg-gradient-to-r from-rosewood to-pink-600 px-6 py-3.5 text-sm font-bold text-white shadow-xl shadow-pink-900/40 transition-all hover:opacity-90 hover:scale-105 sm:px-7"
@@ -334,7 +334,7 @@ export function Landing({ setPage, openAuth }) {
               </button>
             </div>
 
-            <div className="mt-7 grid gap-3 sm:flex sm:flex-wrap sm:gap-5">
+            <div className="mt-5 grid gap-2 sm:flex sm:flex-wrap sm:gap-4">
               {[t.trust1, t.trust2, t.trust3].map((b) => (
                 <span key={b} className="inline-flex items-center gap-1.5 text-sm text-neutral-400">
                   <CheckCircle2 size={14} className="text-pink-400" /> {b}
@@ -346,24 +346,24 @@ export function Landing({ setPage, openAuth }) {
           {/* right — floating card */}
           <div className="relative hidden md:block">
             {/* floating badge top */}
-            <div className="absolute -top-4 -left-6 z-10 rounded-xl bg-white px-4 py-2.5 shadow-2xl flex items-center gap-2.5 animate-bounce-slow">
+            <div className="absolute -top-3 -left-5 z-10 rounded-xl bg-white px-4 py-2 shadow-2xl flex items-center gap-2.5 animate-bounce-slow">
               <div className="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse" />
               <span className="text-xs font-semibold text-neutral-700">{t.activeTailors}</span>
             </div>
 
             <div className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-md p-1.5 shadow-2xl">
-              <div className="rounded-2xl bg-gradient-to-br from-rosewood via-pink-700 to-amethyst p-7 text-white">
-                <p className="text-xs font-bold uppercase tracking-widest text-pink-200 mb-4">{t.cardBadge}</p>
-                <h2 className="text-2xl font-extrabold leading-snug mb-7">{t.cardTitle}</h2>
+              <div className="rounded-2xl bg-gradient-to-br from-rosewood via-pink-700 to-amethyst p-6 text-white">
+                <p className="text-xs font-bold uppercase tracking-widest text-pink-200 mb-3">{t.cardBadge}</p>
+                <h2 className="text-2xl font-extrabold leading-snug mb-5">{t.cardTitle}</h2>
 
-                <div className="grid gap-3">
+                <div className="grid gap-2.5">
                   {[
                     { Icon: ShieldCheck, text: t.feat1 },
                     { Icon: MapPin,      text: t.feat2 },
                     { Icon: TrendingUp,  text: t.feat3 },
                     { Icon: Globe,       text: t.feat4 },
                   ].map(({ Icon, text }) => (
-                    <div key={text} className="flex items-center gap-3 rounded-xl bg-white/12 px-4 py-3 text-sm font-medium backdrop-blur-sm hover:bg-white/20 transition-colors cursor-default">
+                    <div key={text} className="flex items-center gap-3 rounded-xl bg-white/12 px-4 py-2.5 text-sm font-medium backdrop-blur-sm hover:bg-white/20 transition-colors cursor-default">
                       <Icon size={15} className="flex-shrink-0 text-pink-200" />
                       {text}
                     </div>
@@ -372,7 +372,7 @@ export function Landing({ setPage, openAuth }) {
 
                 <button
                   onClick={() => openAuth("tailor")}
-                  className="mt-6 w-full flex items-center justify-center gap-2 rounded-xl bg-white text-rosewood font-bold py-3 text-sm hover:bg-pink-50 transition-colors shadow-lg"
+                  className="mt-5 w-full flex items-center justify-center gap-2 rounded-xl bg-white text-rosewood font-bold py-2.5 text-sm hover:bg-pink-50 transition-colors shadow-lg"
                 >
                   {t.joinTailorBtn} <ArrowRight size={15} />
                 </button>
@@ -380,7 +380,7 @@ export function Landing({ setPage, openAuth }) {
             </div>
 
             {/* floating badge bottom */}
-            <div className="absolute -bottom-4 -right-4 z-10 rounded-xl bg-white px-4 py-2.5 shadow-2xl">
+            <div className="absolute -bottom-3 -right-4 z-10 rounded-xl bg-white px-4 py-2 shadow-2xl">
               <div className="flex items-center gap-1 mb-0.5">
                 {[...Array(5)].map((_, i) => <Star key={i} size={11} className="fill-saffron text-saffron" />)}
               </div>
@@ -389,7 +389,7 @@ export function Landing({ setPage, openAuth }) {
           </div>
         </div>
 
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2">
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2">
           <ChevronDown size={22} className="text-white/30 animate-bounce" />
         </div>
       </section>
