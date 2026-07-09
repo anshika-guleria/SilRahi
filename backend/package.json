@@ -9,7 +9,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "check": "node --check src/server.js && node --check src/config/firebase.js && node --check src/middleware/auth.js && node --check src/routes/auth.js && node --check src/routes/tailors.js && node --check src/routes/customers.js && node --check src/routes/bookings.js && node --check src/routes/reviews.js && node --check src/routes/messages.js && node --check src/routes/admin.js",
+    "check": "node --check src/server.js && node --check src/config/firebase.js && node --check src/middleware/auth.js && node --check src/routes/auth.js && node --check src/routes/ai.js && node --check src/routes/tailors.js && node --check src/routes/customers.js && node --check src/routes/bookings.js && node --check src/routes/reviews.js && node --check src/routes/messages.js && node --check src/routes/admin.js",
     "dev": "nodemon src/server.js",
     "start": "node src/server.js"
   },

@@ -5,6 +5,7 @@ import { AdminPanel } from "./pages/AdminPanel";
 import { AuthPage } from "./pages/AuthPage";
 import { CustomerDashboard } from "./pages/CustomerDashboard";
 import { Landing } from "./pages/Landing";
+import { StyleAdvisor } from "./pages/StyleAdvisor";
 import { TailorDashboard } from "./pages/TailorDashboard";
 import { TailorMap } from "./pages/TailorMap";
 import { TailorProfile } from "./pages/TailorProfile";
@@ -44,6 +45,7 @@ export default function App() {
     if (page === "auth") return <AuthPage setPage={setPage} initialRole={authRole} />;
     if (page === "map") return <TailorMap setPage={setPage} setSelectedTailor={setSelectedTailor} />;
     if (page === "tailorProfile") return <TailorProfile tailor={selectedTailor} setPage={setPage} />;
+    if (page === "aiAdvisor") return <StyleAdvisor setPage={setPage} />;
     if (page === "customer") return user?.role === "customer" ? <CustomerDashboard setPage={setPage} /> : <AuthPage setPage={setPage} initialRole="customer" />;
     if (page === "tailor") return user?.role === "tailor" ? <TailorDashboard /> : <AuthPage setPage={setPage} initialRole="tailor" />;
     if (page === "admin") return user?.role === "admin" ? <AdminPanel /> : <AuthPage setPage={setPage} initialRole="customer" />;
