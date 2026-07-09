@@ -162,7 +162,7 @@ export function TailorProfile({ tailor, setPage }) {
               ["length", "Length"]
             ].map(([key, label]) => (
               <Field key={key} label={`${label} measurement`}>
-                <input className={inputClass} value={form[key]} onChange={(e) => update(key, e.target.value)} placeholder="e.g. 34 inch" />
+                <input className={inputClass} value={form[key]} onChange={(e) => update(key, e.target.value)} placeholder="e.g. 34 inch" required />
               </Field>
             ))}
           </div>
@@ -173,7 +173,7 @@ export function TailorProfile({ tailor, setPage }) {
           <Field label="Expected completion date">
             <div className="relative">
               <CalendarDays className="pointer-events-none absolute left-3 top-3 text-neutral-400" size={18} />
-              <input type="date" className={`${inputClass} pl-10`} value={form.deliveryDate} onChange={(e) => update("deliveryDate", e.target.value)} required />
+              <input type="date" className={`${inputClass} pl-10`} min={new Date().toISOString().split("T")[0]} value={form.deliveryDate} onChange={(e) => update("deliveryDate", e.target.value)} required />
             </div>
           </Field>
           <label className="flex cursor-pointer flex-col items-start justify-between gap-3 rounded-xl border border-dashed border-pink-200 bg-pink-50 p-4 sm:flex-row sm:items-center">
