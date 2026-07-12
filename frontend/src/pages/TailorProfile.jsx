@@ -162,7 +162,7 @@ export function TailorProfile({ tailor, setPage }) {
               ["length", "Length"]
             ].map(([key, label]) => (
               <Field key={key} label={`${label} measurement`}>
-                <input className={inputClass} value={form[key]} onChange={(e) => update(key, e.target.value)} placeholder="e.g. 34 inch" required />
+                <input className={inputClass} value={form[key]} onChange={(e) => update(key, e.target.value)} placeholder="e.g. 34 inch" />
               </Field>
             ))}
           </div>
